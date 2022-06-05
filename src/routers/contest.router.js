@@ -1,4 +1,4 @@
 const contestRouter = require("express").Router();
-contestRouter.get("/getcontest/:id");
-contestRouter.post("/getcontest/:id");
+contestRouter.get("/");
+contestRouter.post("/createcontest");
 module.exports = contestRouter;
