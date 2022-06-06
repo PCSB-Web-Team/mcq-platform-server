@@ -1,6 +1,6 @@
 const participantRouter = require("express").Router();
 participantRouter.get("/");
-participantRouter.post("/");
+participantRouter.post("/createparticipant");
 participantRouter.put("/attempted");
 participantRouter.put("/bookmark");
 participantRouter.put("/timetaken");
