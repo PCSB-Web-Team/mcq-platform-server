@@ -10,7 +10,7 @@ Router.use("/question", question);
 Router.use("/instruction", instructionRouter);
 Router.use("/participant", participant);
 Router.get("", (req, res) => {
-  res.send("Welcome to Xenia-Verse");
+  res.send("Welcome to PCSB MCQ Platform");
 });
 
 module.exports = Router;
