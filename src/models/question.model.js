@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
   contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
+  questionName: { type: String },
   questionDescription: [
     {
       questionType: { type: String },
@@ -11,11 +12,13 @@ const questionSchema = new Schema({
   ],
   options: [
     {
-      questionType: { type: String },
-      data: { type: String },
+      A: { type: String },
+      B: { type: String },
+      C: { type: String },
+      D: { type: String },
     },
   ],
-  correctOption: { type: Number },
+  correctOption: { type: String },
 });
 
 const Question = mongoose.model("Question", questionSchema);

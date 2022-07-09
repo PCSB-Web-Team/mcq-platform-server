@@ -18,7 +18,9 @@ async function newContest(req, res) {
     } else {
       res
         .status(400)
-        .send("Invalid data received, please send name, descriptions, startTime, endTime");
+        .send(
+          "Invalid data received, please send name, descriptions, startTime, endTime"
+        );
     }
   } catch (err) {
     res.status(400).send(err.message);
@@ -78,7 +80,7 @@ async function getAllContest(req, res) {
 
 async function updateContest(req, res) {
   const body = req.body;
-  const {contestId} = req.params;
+  const { contestId } = req.params;
   try {
     var updatedContest = {};
 
