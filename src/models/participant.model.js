@@ -11,7 +11,7 @@ const participantSchema = new Schema({
   questions: [
     {
       questionId: { type: Schema.Types.ObjectId, ref: "Question" },
-      bookmark: Boolean,
+      bookmark: {type:Boolean,default:false},
       attempted: { type: Number, default: null },
     },
   ],

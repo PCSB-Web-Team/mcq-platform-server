@@ -11,6 +11,7 @@ questionRouter.get("/", getAllQuestions); //get all questions
 questionRouter.get("/:contestid", getQuestionsForContest);
 questionRouter.get("/:contestid/:userid"); //get all questions for a particular user for particular contest
 questionRouter.post("/createquestion", createquestion);
+// questionRouter.get("/:questionId", getQuestion);
 questionRouter.put("/:questionId", updateQuestion);
 questionRouter.delete("/:questionId", deleteQuestion);
 module.exports = questionRouter;
