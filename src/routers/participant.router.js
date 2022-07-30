@@ -1,11 +1,11 @@
-const { attemptQuestion } = require("../controller/participant.router");
+const { attemptQuestion,createParticipant,bookmarkQuestion,clearQuestion,submitTest} = require("../controller/participant.controller");
 
 const participantRouter = require("express").Router();
 participantRouter.get("/");
-participantRouter.post("/createparticipant");
+participantRouter.post("/createparticipant",createParticipant);
 participantRouter.put("/attempted",attemptQuestion);
-participantRouter.put("/bookmark");
-participantRouter.put("/clearattempted");
+participantRouter.put("/bookmark",bookmarkQuestion);
+participantRouter.put("/clearattempted",clearQuestion);
 participantRouter.put("/updatequestions");
-participantRouter.put("/submit");
+participantRouter.put("/submit",submitTest);
 module.exports = participantRouter;
