@@ -6,6 +6,5 @@ participantRouter.post("/createparticipant",createParticipant);
 participantRouter.put("/attempted",attemptQuestion);
 participantRouter.put("/bookmark",bookmarkQuestion);
 participantRouter.put("/clearattempted",clearQuestion);
-participantRouter.put("/updatequestions");
 participantRouter.put("/submit",submitTest);
 module.exports = participantRouter;

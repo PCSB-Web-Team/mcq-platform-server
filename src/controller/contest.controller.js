@@ -14,16 +14,16 @@ async function newContest(req, res) {
         startTime,
         endTime,
       });
-      res.send(newContest);
+      return res.send(newContest);
     } else {
-      res
+      return res
         .status(400)
         .send(
           "Invalid data received, please send name, descriptions, startTime, endTime"
         );
     }
   } catch (err) {
-    res.status(400).send(err.message);
+    return res.status(400).send(err.message);
   }
 }
 

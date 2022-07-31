@@ -7,7 +7,7 @@ const contestSchema = new Schema({
   descriptions: [{ type: String }],
   // instructions: [{ type: String }],
   // pointPerQuestion: { type: Number },
-  // totalQuestions: { type: Number },
+  totalQuestions: { type: Number },
   // negativeMarking: { type: Number },
   // time: { type: Number },
   startTime: { type: Date },
