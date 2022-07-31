@@ -1,5 +1,6 @@
 const Contest = require("../models/contest.model");
 const Participant = require("../models/participant.model");
+const Question = require("../models/question.model");
 
 // Create a new Contest
 
@@ -42,39 +43,65 @@ async function getAllContest(req, res) {
   }
 }
 
-// // Get all user registered contest
+// Get all user registered contest
 
-// async function getAllContest(req, res) {
-//   try {
-//     const allContests = await Contest.find({});
-//     if (allContests.length === 0) {
-//       res.status(404).send("No active contest at the moment");
-//     } else {
-//       res.send(allContests);
-//     }
-//   } catch (err) {
-//     res.status(404).send(err.message);
-//   }
-// }
+async function getUserRegisteredContests(req, res) {
+  try {
+    const { userId } = req.params;
+    const userRegisteredContests = await Participant.find({userId: userId});
+    if (userRegisteredContests.length === 0) {
+      res.status(404).send(userRegisteredContests);
+    } else {
+      res.status(200).send(userRegisteredContests);
+    }
+  } catch (err) {
+    res.status(404).send(err.message);
+  }
+}
 
-// //Enter a contest
+//Enter a contest
 
-// async function enterContest(req, res) {
-//   const { userId, contestId } = req.params;
+async function enterContest(req, res) {
+  const { contestId, userId } = req.params;
 
-//   try {
-//     let questions = await Questions.find({constestId: contestId});
-//     questions = questions.sort(() => Math.random() - 0.5);
-//     questions = questions.slice(0, 30);
-//     const participant = await Participant.findOneAndUpdate({ userId: userId, contestId: contestId }, {
-//       $set:{questions: questions}
-//     });
+  try {
 
-//     res.send(contest);
-//   } catch (err) {
-//     res.status(400).send(err.message);
-//   }
-// }
+    const participantContest = await Participant.findOne({userId: userId, contestId: contestId});
+    
+    //If not registered for the contest
+    if(!participantContest) {
+      return res.status(404).send({msg:"user not registered"});
+    }
+
+    const contest = await Contest.findOne({contestId: contestId});
+
+    //If entring first time (lenght of questions assigned to participants does not match to total questions defined for a contest)
+    if(participantContest.questions.length!=contest.totalQuestions){
+
+      let questions = await Question.find({constestId: contestId});
+
+      //Random question generation
+      for (let i = questions.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+      questions = questions.slice(0, contest.totalQuestions-1);
+
+      //Pushing the questions into the participants registered contest
+      const participant = await Participant.findOneAndUpdate({ userId: userId, contestId: contestId }, {
+        $set:{questions: questions}
+      });
+
+      return res.status(200).send({msg:"User entring first time", firstEnter: true})
+    }
+
+    //If not entered for the first time then send false 
+    return res.status(200).send({msg:"User already started", firstEnter: false})
+
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+}
 
 //Update the contest
 
@@ -111,4 +138,4 @@ async function deleteContest(req, res) {
   }
 }
 
-module.exports = { newContest, getAllContest, updateContest, deleteContest };
+module.exports = { newContest, getAllContest, getUserRegisteredContests, enterContest, updateContest, deleteContest };

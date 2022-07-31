@@ -1,3 +1,4 @@
+const Participant = require("../models/participant.model");
 const Question = require("../models/question.model");
 
 //create question
@@ -21,6 +22,21 @@ async function createquestion(req, res) {
     res.send(createquestion);
   } catch (err) {
     res.status(400).send(err.message);
+  }
+}
+
+//get question
+
+async function getQuestion(req, res) {
+
+  const { questionId } = req.params;
+
+  try {
+    const question = await Question.findOne({_id: questionId});
+    if(!question) return res.status(404).send(question)
+    return res.status(200).send(question);
+  } catch (err) {
+    return res.status(404).send(err.message);
   }
 }
 
@@ -85,10 +101,27 @@ async function deleteQuestion(req, res) {
   }
 }
 
+
+async function getUserQuestions(req, res) {
+
+  const { contestId, userId } = req.params;
+
+  try {
+    const participant = await Participant.findOne({contestId: contestId, userId: userId});
+    if(!participant) return res.status(404).send({msg: "no user found"})
+    return res.status(200).send(participant.questions);
+  } catch (err) {
+    return res.status(404).send(err.message);
+  }
+}
+
+
 module.exports = {
   createquestion,
+  getQuestion,
   getAllQuestions,
   getQuestionsForContest,
   updateQuestion,
   deleteQuestion,
+  getUserQuestions,
 };

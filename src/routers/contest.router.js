@@ -1,8 +1,8 @@
-const { newContest, getAllContest, updateContest, deleteContest } = require("../controller/contest.controller");
+const { newContest, getAllContest, getUserRegisteredContests, enterContest, updateContest, deleteContest } = require("../controller/contest.controller");
 const contestRouter = require("express").Router();
 
-contestRouter.get("/:userId");
-contestRouter.post("/entercontest/:contestId/:userId");
+contestRouter.get("/:userId", getUserRegisteredContests);
+contestRouter.post("/entercontest/:contestId/:userId", enterContest);
 contestRouter.post("/createcontest", newContest);
 contestRouter.get("/", getAllContest);
 contestRouter.put("/:contestId", updateContest);
