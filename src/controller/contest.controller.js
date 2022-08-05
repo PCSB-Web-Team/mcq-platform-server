@@ -5,7 +5,7 @@ const Question = require("../models/question.model");
 // Create a new Contest
 
 async function newContest(req, res) {
-  const { name, descriptions, startTime, endTime } = req.body;
+  const { name, descriptions, startTime, endTime, totalQuestions } = req.body;
 
   try {
     if (name && descriptions && startTime && endTime) {
@@ -14,6 +14,7 @@ async function newContest(req, res) {
         descriptions,
         startTime,
         endTime,
+        totalQuestions
       });
       return res.send(newContest);
     } else {
@@ -62,6 +63,7 @@ async function getUserRegisteredContests(req, res) {
 //Enter a contest
 
 async function enterContest(req, res) {
+
   const { contestId, userId } = req.params;
 
   try {
@@ -85,11 +87,14 @@ async function enterContest(req, res) {
         let j = Math.floor(Math.random() * (i + 1));
         [questions[i], questions[j]] = [questions[j], questions[i]];
       }
-      questions = questions.slice(0, contest.totalQuestions-1);
+      questions = questions.slice(0, contest.totalQuestions);
 
-      //Pushing the questions into the participants registered contest
+      //Get the question_ids into an array
+      const questionIds = questions.map((question)=>{return {questionId: question._id}})
+
+      //Push the ids into the participants array
       const participant = await Participant.findOneAndUpdate({ userId: userId, contestId: contestId }, {
-        $set:{questions: questions}
+        $set:{questions: questionIds}
       });
 
       return res.status(200).send({msg:"User entring first time", firstEnter: true})
@@ -101,6 +106,7 @@ async function enterContest(req, res) {
   } catch (err) {
     res.status(400).send(err.message);
   }
+
 }
 
 //Update the contest
