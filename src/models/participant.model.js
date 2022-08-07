@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 const participantSchema = new Schema({
-  userId: Schema.Types.ObjectId,
+  userId: { type: mongoose.SchemaTypes.ObjectId, required: true},
+  name: { type: String, required: true },
   contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
   started: { type: Boolean, default: false },
   score: { type: Number, default: 0 },

@@ -5,12 +5,12 @@ const Question = require("../models/question.model");
 // Create a new Contest
 
 async function newContest(req, res) {
-  const { name, descriptions, startTime, endTime, totalQuestions } = req.body;
+  const { title, descriptions, startTime, endTime, totalQuestions } = req.body;
 
   try {
-    if (name && descriptions && startTime && endTime) {
+    if (title && descriptions && startTime && endTime) {
       const newContest = await Contest.create({
-        name,
+        title,
         descriptions,
         startTime,
         endTime,
@@ -117,7 +117,7 @@ async function updateContest(req, res) {
   try {
     var updatedContest = {};
 
-    if (body.name) updatedContest.name = body.name;
+    if (body.title) updatedContest.title = body.title;
     if (body.descriptions) updatedContest.descriptions = body.descriptions;
     if (body.startTime) updatedContest.startTime = body.startTime;
     if (body.endTime) updatedContest.endTime = body.endTime;

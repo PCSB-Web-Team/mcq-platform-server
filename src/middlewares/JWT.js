@@ -1,13 +1,13 @@
 require("dotenv").config();
 const Participant = require("../models/participant.model");
-const tokenRouter = require("express").Router();
-const res = require("express/lib/response");
-const JWT = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const { sign, verify } = require("jsonwebtoken");
 
-async function generateToken(user) {
-  const token = await JWT.sign(
+async function createToken(user) {
+  const token = await jwt.sign(
     {
       id: user._id,
+      email: user.email,
     },
     process.env.Secret,
     {
@@ -17,24 +17,20 @@ async function generateToken(user) {
   return token;
 }
 
-async function checkToken(req, res, next) {
-  const token = req.headers["authorization"];
-  // console.log(token);
-  if (!token) {
-    return res.status(400).json({
-      msg: "No token found",
-    });
-  }
+const validateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
+    return res.status(400).json({ error: "User not Authenticated!" });
+
+  const token = authHeader.split(" ")[1];
 
   try {
-    const user = JWT.verify(token, process.env.Secret);
-    req.body.userID = user.id;
-  } catch (error) {
-    return res.status(400).json({
-      msg: "Token Invalid",
-    });
+    const verified = jwt.verify(token, process.env.Secret);
+    req.user = verified;
+  } catch (err) {
+    return res.status(401).send("Invalid Token");
   }
   return next();
-}
+};
 
-module.exports = { generateToken, checkToken };
+module.exports = { createToken, validateToken };

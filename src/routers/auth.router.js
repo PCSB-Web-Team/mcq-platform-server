@@ -1,7 +1,7 @@
 const authRouter = require("express").Router();
-const { login } = require("../controller/auth.controller");
+const { login, generateUser } = require("../controller/auth.controller");
 const { checkToken } = require("../middlewares/JWT");
 
-authRouter.post("/", login);
-
+authRouter.post("/login", login);
+authRouter.post("/generate-user",generateUser);
 module.exports = authRouter;

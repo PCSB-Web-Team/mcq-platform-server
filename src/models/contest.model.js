@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 const moment = require("moment");
 
 const contestSchema = new Schema({
-  name: { type: String },
+  title: { type: String },
   descriptions: [{ type: String }],
   // instructions: [{ type: String }],
   // pointPerQuestion: { type: Number },
