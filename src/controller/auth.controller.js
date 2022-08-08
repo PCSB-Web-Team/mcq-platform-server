@@ -1,10 +1,16 @@
 require("dotenv").config();
 const Participant = require("../models/participant.model");
 const { createToken, validateToken } = require("../middlewares/jwt");
-const User=require("../models/user.model")
-const Contest=require("../models/contest.model")
+const User = require("../models/user.model");
+const Contest = require("../models/contest.model");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const {
+  HttpApiResponse,
+  HandleError,
+  HttpErrorResponse,
+} = require("../utils/utils");
+
 // Login route
 async function login(req, res) {
   try {
@@ -13,17 +19,18 @@ async function login(req, res) {
     // Find user
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(404).send("User not found");
+    if (!user) return res.status(404).send(HttpErrorResponse("User not found"));
 
     if (await bcrypt.compare(password, user.password)) {
       const token = await createToken(user);
       user.token = token;
-      return res.json(user);
+      return res.json(HttpApiResponse(user));
     }
 
-    return res.status(404).send("Invalid Password");
+    return res.status(404).send(HttpErrorResponse("Invalid Password"));
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Auth", "login", err);
+    res.status(400).send(HttpErrorResponse(err));
   }
 }
 
@@ -33,7 +40,7 @@ async function generateUser(req, res) {
     const { email, eventName, name, mobile } = req.body;
 
     // Find user
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
     //Create a new user if already does not exists
     if (!user) {
@@ -54,28 +61,64 @@ async function generateUser(req, res) {
 
     //Find contest ID
     const contest = await Contest.findOne({ title: eventName });
-    if (!contest) res.status(404).send("No contest exist with such name");
+    if (!contest)
+      return res
+        .status(404)
+        .send(HttpErrorResponse("No contest exist with such name"));
 
     const contestId = contest._id;
 
     //Register the user to the event
-    const findParticipant = await Participant.findOne({ "userId":user._id,"contestId":contestId });
+    const findParticipant = await Participant.findOne({
+      userId: user._id,
+      contestId: contestId,
+    });
+
     if (findParticipant) {
       console.log("Already participated in this contest");
-      return false;
+      return res.send(
+        HttpErrorResponse("Already participated in this contest")
+      );
     }
-    const createParticipant=await Participant.create({"userId":user._id,"contestId":contestId});
 
-    if (createParticipant){
-      await axios.post(process.env.sendEmail, { email: email, password: user.password, eventName: eventName }).then((response) => { console.log(`Mail Sent to ${email} with status: `+response.status); }, (error) => { console.log("Error while mail sending"); });
+    const createParticipant = await Participant.create({
+      userId: user._id,
+      contestId: contestId,
+    });
 
-      return res.status(200).send("User created and registered successfully");
-    }
-      
-    else return res.status(400).send("User has not been registered or participant already exist");
+    if (createParticipant) {
+      await axios
+        .post(process.env.sendEmail, {
+          email: email,
+          password: user.password,
+          eventName: eventName,
+        })
+        .then(
+          (response) => {
+            console.log(
+              `Mail Sent to ${email} with status: ` + response.status
+            );
+          },
+          (error) => {
+            console.log("Error while mail sending");
+          }
+        );
+
+      return res
+        .status(200)
+        .send(HttpApiResponse("User created and registered successfully"));
+    } else
+      return res
+        .status(400)
+        .send(
+          HttpErrorResponse(
+            "User has not been registered or participant already exist"
+          )
+        );
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Auth", "generateUser", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
-module.exports = { login,generateUser };
+module.exports = { login, generateUser };
