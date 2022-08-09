@@ -1,6 +1,11 @@
 const Contest = require("../models/contest.model");
 const Participant = require("../models/participant.model");
 const Question = require("../models/question.model");
+const {
+  HttpErrorResponse,
+  HttpApiResponse,
+  HandleError,
+} = require("../utils/utils");
 
 // Create a new Contest
 
@@ -14,17 +19,20 @@ async function newContest(req, res) {
         descriptions,
         startTime,
         endTime,
-        totalQuestions
+        totalQuestions,
       });
-      return res.send(newContest);
+      return res.send(HttpApiResponse(newContest));
     } else {
       return res
         .status(400)
         .send(
-          "Invalid data received, please send name, descriptions, startTime, endTime"
+          HttpErrorResponse(
+            "Invalid data received, please send title, descriptions, startTime, endTime"
+          )
         );
     }
   } catch (err) {
+    HandleError("Contests", "newContest", err);
     return res.status(400).send(err.message);
   }
 }
@@ -49,7 +57,7 @@ async function getAllContest(req, res) {
 async function getUserRegisteredContests(req, res) {
   try {
     const { userId } = req.params;
-    const userRegisteredContests = await Participant.find({userId: userId});
+    const userRegisteredContests = await Participant.find({ userId: userId });
     if (userRegisteredContests.length === 0) {
       res.status(404).send(userRegisteredContests);
     } else {
@@ -63,24 +71,24 @@ async function getUserRegisteredContests(req, res) {
 //Enter a contest
 
 async function enterContest(req, res) {
-
   const { contestId, userId } = req.params;
 
   try {
+    const participantContest = await Participant.findOne({
+      userId: userId,
+      contestId: contestId,
+    });
 
-    const participantContest = await Participant.findOne({userId: userId, contestId: contestId});
-    
     //If not registered for the contest
-    if(!participantContest) {
-      return res.status(404).send({msg:"user not registered"});
+    if (!participantContest) {
+      return res.status(404).send({ msg: "user not registered" });
     }
 
-    const contest = await Contest.findOne({contestId: contestId});
+    const contest = await Contest.findOne({ contestId: contestId });
 
     //If entring first time (lenght of questions assigned to participants does not match to total questions defined for a contest)
-    if(participantContest.questions.length!=contest.totalQuestions){
-
-      let questions = await Question.find({constestId: contestId});
+    if (participantContest.questions.length != contest.totalQuestions) {
+      let questions = await Question.find({ constestId: contestId });
 
       //Random question generation
       for (let i = questions.length - 1; i > 0; i--) {
@@ -90,23 +98,30 @@ async function enterContest(req, res) {
       questions = questions.slice(0, contest.totalQuestions);
 
       //Get the question_ids into an array
-      const questionIds = questions.map((question)=>{return {questionId: question._id}})
-
-      //Push the ids into the participants array
-      const participant = await Participant.findOneAndUpdate({ userId: userId, contestId: contestId }, {
-        $set:{questions: questionIds}
+      const questionIds = questions.map((question) => {
+        return { questionId: question._id };
       });
 
-      return res.status(200).send({msg:"User entring first time", firstEnter: true})
+      //Push the ids into the participants array
+      const participant = await Participant.findOneAndUpdate(
+        { userId: userId, contestId: contestId },
+        {
+          $set: { questions: questionIds },
+        }
+      );
+
+      return res
+        .status(200)
+        .send({ msg: "User entring first time", firstEnter: true });
     }
 
-    //If not entered for the first time then send false 
-    return res.status(200).send({msg:"User already started", firstEnter: false})
-
+    //If not entered for the first time then send false
+    return res
+      .status(200)
+      .send({ msg: "User already started", firstEnter: false });
   } catch (err) {
     res.status(400).send(err.message);
   }
-
 }
 
 //Update the contest
@@ -144,4 +159,11 @@ async function deleteContest(req, res) {
   }
 }
 
-module.exports = { newContest, getAllContest, getUserRegisteredContests, enterContest, updateContest, deleteContest };
+module.exports = {
+  newContest,
+  getAllContest,
+  getUserRegisteredContests,
+  enterContest,
+  updateContest,
+  deleteContest,
+};
