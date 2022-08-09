@@ -12,10 +12,6 @@ app.use(
   })
 );
 
-//run npm i and also install cors
-
-app.get("/api", (req, res) => res.send("Welcome to PCSB's MCQ Platform!"))
-
 app.use("/api", Router);
 
 let port = process.env.PORT || 4000;
