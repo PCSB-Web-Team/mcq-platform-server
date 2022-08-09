@@ -43,11 +43,14 @@ async function getAllContest(req, res) {
   try {
     const allContests = await Contest.find({});
     if (allContests.length === 0) {
-      res.status(404).send("No active contest at the moment");
+      res
+        .status(404)
+        .send(HttpErrorResponse("No active contest at the moment"));
     } else {
-      res.send(allContests);
+      res.send(HttpApiResponse(allContests));
     }
   } catch (err) {
+    HandleError("Contest", "getAllContest", err);
     res.status(404).send(err.message);
   }
 }
