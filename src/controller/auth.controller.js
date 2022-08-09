@@ -28,6 +28,7 @@ async function login(req, res) {
     }
 
     return res.status(404).send(HttpErrorResponse("Invalid Password"));
+    
   } catch (err) {
     await HandleError("Auth", "login", err);
     res.status(400).send(HttpErrorResponse(err));

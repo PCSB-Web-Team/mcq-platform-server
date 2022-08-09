@@ -1,8 +1,8 @@
 const ErrorLog = require("../models/error.model");
 
-function HttpResponse(status, data, error) {
+function HttpResponse(success, data, error) {
   return {
-    status,
+    success,
     data,
     error,
   };
