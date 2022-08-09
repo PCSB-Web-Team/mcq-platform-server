@@ -7,7 +7,6 @@ const {
 } = require("../utils/utils");
 
 //create question
-
 async function createquestion(req, res) {
   let data = ({
     contestId,
@@ -28,7 +27,7 @@ async function createquestion(req, res) {
     });
     res.send(HttpApiResponse(createquestion));
   } catch (err) {
-    HandleError("Question", "createQuestion", err);
+    await HandleError("Question", "createQuestion", err);
     res.status(400).send(HttpErrorResponse(err.message));
   }
 }
@@ -41,9 +40,10 @@ async function getQuestion(req, res) {
   try {
     const question = await Question.findOne({ _id: questionId });
     if (!question) return res.status(404).send(question);
-    return res.status(200).send(question);
+    return res.status(200).send(HttpApiResponse(question));
   } catch (err) {
-    return res.status(404).send(err.message);
+    await HandleError("Question", "getQuestion", err);
+    return res.status(404).send(HttpErrorResponse(err.messages));
   }
 }
 
@@ -55,7 +55,7 @@ async function getAllQuestions(req, res) {
 
     res.send(HttpApiResponse(allQuestions));
   } catch (err) {
-    HandleError("Question", "getAllQuestions", err);
+    await HandleError("Question", "getAllQuestions", err);
     res.status(404).send(HttpErrorResponse(err.message));
   }
 }
@@ -95,9 +95,10 @@ async function updateQuestion(req, res) {
       updatedQuestion
     );
 
-    res.send(updateQuestion);
+    res.send(HttpApiResponse(updateQuestion));
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Question", "updateQuestion", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -107,9 +108,10 @@ async function deleteQuestion(req, res) {
   const { questionId } = req.params;
   try {
     const deleteQuestion = await Question.findOneAndRemove({ _id: questionId });
-    res.send(deleteQuestion);
+    res.send(HttpApiResponse(deleteQuestion));
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Questions", "deleteQuestion", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -134,9 +136,10 @@ async function getUserQuestions(req, res) {
       _id: { $in: questionId },
     });
 
-    return res.status(200).send(participantQuestions);
+    return res.status(200).send(HttpApiResponse(participantQuestions));
   } catch (err) {
-    return res.status(404).send(err.message);
+    await HandleError("Question", "getUserQuestions", err);
+    return res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
