@@ -1,39 +1,39 @@
 const Participant = require("../models/participant.model");
 const Question = require("../models/question.model");
+const {
+  HttpApiResponse,
+  HandleError,
+  HttpErrorResponse,
+} = require("../utils/utils");
 
 //create question
 
 async function createquestion(req, res) {
-  const {
-    contestId,
-    questionName,
-    questionDescription,
-    options,
-    correctOption,
-  } = req.body;
+  const { contestId, title, questionDescription, options, correctOption } =
+    req.body;
   try {
     const createquestion = await Question.create({
       contestId,
-      questionName,
+      title,
       questionDescription,
       options,
       correctOption,
     });
-    res.send(createquestion);
+    res.send(HttpApiResponse(createquestion));
   } catch (err) {
-    res.status(400).send(err.message);
+    HandleError("Question", "createQuestion", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
 //get question
 
 async function getQuestion(req, res) {
-
   const { questionId } = req.params;
 
   try {
-    const question = await Question.findOne({_id: questionId});
-    if(!question) return res.status(404).send(question)
+    const question = await Question.findOne({ _id: questionId });
+    if (!question) return res.status(404).send(question);
     return res.status(200).send(question);
   } catch (err) {
     return res.status(404).send(err.message);
@@ -73,8 +73,9 @@ async function updateQuestion(req, res) {
   try {
     let updatedQuestion = {};
 
-    if (body.questionName) updatedQuestion.questionName = body.questionName;
-    if (body.questionDescription) updatedQuestion.questionDescription = body.questionDescription;
+    if (body.title) updatedQuestion.title = body.title;
+    if (body.questionDescription)
+      updatedQuestion.questionDescription = body.questionDescription;
     if (body.options) updatedQuestion.options = body.options;
     if (body.correctOption) updatedQuestion.correctOption = body.correctOption;
 
@@ -103,28 +104,30 @@ async function deleteQuestion(req, res) {
 
 //test this
 async function getUserQuestions(req, res) {
-
   const { contestId, userId } = req.params;
 
   try {
-    const participant = await Participant.findOne({contestId: contestId, userId: userId});
-    if(!participant) return res.status(404).send({msg: "no user found"})
+    const participant = await Participant.findOne({
+      contestId: contestId,
+      userId: userId,
+    });
+    if (!participant) return res.status(404).send({ msg: "no user found" });
 
-    const questions=(participant.questions);
-    
-    const questionId=questions.map((question)=>{
+    const questions = participant.questions;
+
+    const questionId = questions.map((question) => {
       return question.questionId;
     });
 
-    const participantQuestions=await Question.find({'_id':{$in:questionId}});
+    const participantQuestions = await Question.find({
+      _id: { $in: questionId },
+    });
 
     return res.status(200).send(participantQuestions);
-
   } catch (err) {
     return res.status(404).send(err.message);
   }
 }
-
 
 module.exports = {
   createquestion,

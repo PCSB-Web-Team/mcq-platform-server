@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
   contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
-  questionName: { type: String },
+  title: { type: String },
   questionDescription: [
     {
       questionType: { type: String },

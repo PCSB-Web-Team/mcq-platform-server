@@ -32,8 +32,8 @@ async function newContest(req, res) {
         );
     }
   } catch (err) {
-    HandleError("Contests", "newContest", err);
-    return res.status(400).send(err.message);
+    await HandleError("Contests", "newContest", err);
+    return res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -50,8 +50,8 @@ async function getAllContest(req, res) {
       res.send(HttpApiResponse(allContests));
     }
   } catch (err) {
-    HandleError("Contest", "getAllContest", err);
-    res.status(404).send(err.message);
+    await HandleError("Contest", "getAllContest", err);
+    res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -61,13 +61,10 @@ async function getUserRegisteredContests(req, res) {
   try {
     const { userId } = req.params;
     const userRegisteredContests = await Participant.find({ userId: userId });
-    if (userRegisteredContests.length === 0) {
-      res.status(404).send(userRegisteredContests);
-    } else {
-      res.status(200).send(userRegisteredContests);
-    }
+    res.status(200).send(HttpApiResponse(userRegisteredContests));
   } catch (err) {
-    res.status(404).send(err.message);
+    await HandleError("Contest", "getUserRegisteredContests", err);
+    res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -84,7 +81,7 @@ async function enterContest(req, res) {
 
     //If not registered for the contest
     if (!participantContest) {
-      return res.status(404).send({ msg: "user not registered" });
+      throw new Error("User not registered");
     }
 
     const contest = await Contest.findOne({ contestId: contestId });
@@ -115,20 +112,24 @@ async function enterContest(req, res) {
 
       return res
         .status(200)
-        .send({ msg: "User entring first time", firstEnter: true });
+        .send(
+          HttpApiResponse({ msg: "User entring first time", firstEnter: true })
+        );
     }
 
     //If not entered for the first time then send false
     return res
       .status(200)
-      .send({ msg: "User already started", firstEnter: false });
+      .send(
+        HttpApiResponse({ msg: "User already started", firstEnter: false })
+      );
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Contest", "enterContest", err);
+    res.status(400).send(HttpErrorResponse(err.messages));
   }
 }
 
 //Update the contest
-
 async function updateContest(req, res) {
   const body = req.body;
   const { contestId } = req.params;
@@ -144,9 +145,10 @@ async function updateContest(req, res) {
 
     const contest = await Contest.updateOne({ _id: contestId }, updatedContest);
 
-    res.send(contest);
+    res.send(HttpApiResponse(contest));
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Contest", "UpdateContest", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -158,7 +160,8 @@ async function deleteContest(req, res) {
     const contest = await Contest.findOneAndRemove({ _id: contestId });
     res.send(contest);
   } catch (err) {
-    res.status(400).send(err.message);
+    await HandleError("Contest", "deleteConstest", err);
+    res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
