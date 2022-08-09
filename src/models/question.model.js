@@ -10,15 +10,12 @@ const questionSchema = new Schema({
       data: { type: String },
     },
   ],
-  options: [
-    {
-      A: { type: String },
-      B: { type: String },
-      C: { type: String },
-      D: { type: String },
-    },
-  ],
-  correctOption: { type: String },
+  options: {
+    type: [{ type: String }],
+    default: [],
+  },
+  correctOption: { type: String, default: null },
+  points: { type: Number, default: 1 },
 });
 
 const Question = mongoose.model("Question", questionSchema);

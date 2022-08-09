@@ -9,9 +9,16 @@ const {
 //create question
 
 async function createquestion(req, res) {
-  const { contestId, title, questionDescription, options, correctOption } =
-    req.body;
+  let data = ({
+    contestId,
+    title,
+    questionDescription,
+    options,
+    correctOption,
+    points,
+  } = req.body);
   try {
+    if (!data.points) data.points = 1;
     const createquestion = await Question.create({
       contestId,
       title,
