@@ -12,6 +12,7 @@ const contestSchema = new Schema({
   // time: { type: Number },
   startTime: { type: Date },
   endTime: { type: Date },
+  logo: { type: String },
   // status: { type: Number, default: 1 },
 });
 

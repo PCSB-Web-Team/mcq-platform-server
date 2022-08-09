@@ -127,4 +127,20 @@ async function generateUser(req, res) {
   }
 }
 
-module.exports = { login, generateUser };
+async function getProfile(req, res) {
+  try {
+    // Find user without sending password and version key (__v)
+    const userId = req.user.id;
+    console.log("[Auth] Get by user-id: " + req.user.id);
+    const user = await User.findById(req.user.id).select("-password -__v");
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(404).send("No user exists with such id");
+    }
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+}
+
+module.exports = { login, generateUser, getProfile };
