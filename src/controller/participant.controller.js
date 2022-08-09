@@ -1,7 +1,11 @@
 const Participant = require("../models/participant.model");
 const Contest = require("../models/contest.model");
 const moment = require("moment");
-const { HttpErrorResponse, HttpApiResponse } = require("../utils/utils");
+const {
+  HttpErrorResponse,
+  HttpApiResponse,
+  HandleError,
+} = require("../utils/utils");
 const User = require("../models/user.model");
 
 async function createParticipant(req, res) {
@@ -88,10 +92,22 @@ async function submitTest(req, res) {
   }
 }
 
+async function getUserParticipations(req, res) {
+  const { userId } = req.params;
+  try {
+    const participations = await Participant.find({ userId });
+    res.send(HttpApiResponse(participations));
+  } catch (err) {
+    await HandleError(err);
+    res.send(HttpErrorResponse(err));
+  }
+}
+
 module.exports = {
   attemptQuestion,
   createParticipant,
   bookmarkQuestion,
   clearQuestion,
   submitTest,
+  getUserParticipations,
 };
