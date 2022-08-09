@@ -21,7 +21,7 @@ async function login(req, res) {
 
     if (!user) return res.status(404).send(HttpErrorResponse("User not found"));
 
-    if (await bcrypt.compare(password, user.password)) {
+    if (password==user.password) {
       const token = await createToken(user);
       user.token = token;
       return res.status(200).json(HttpApiResponse(user));
@@ -52,14 +52,11 @@ async function generateUser(req, res) {
       // Generate random password
       const password = Math.random().toString(36).slice(2, 10);
 
-      // Encrypting password
-      const encyptedPassword = await bcrypt.hash(password, 10);
-
       // Creating a user
       user = await User.create({
         name,
         email,
-        password: encyptedPassword,
+        password: password,
         phoneNumber: mobile,
       });
     }
