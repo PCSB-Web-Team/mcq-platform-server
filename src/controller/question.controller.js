@@ -62,9 +62,11 @@ async function getAllQuestions(req, res) {
 //get all questions for particular contest
 
 async function getQuestionsForContest(req, res) {
+  const { contestId } = req.params;
   try {
+    if (!contestId) throw new Error("contestId Invalid or not found");
     const getQuestionsForContest = await Question.find({
-      contestId: req.params.contestid,
+      contestId,
     });
     res.send(getQuestionsForContest);
   } catch (err) {
