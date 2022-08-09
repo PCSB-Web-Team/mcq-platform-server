@@ -101,7 +101,7 @@ async function deleteQuestion(req, res) {
   }
 }
 
-
+//test this
 async function getUserQuestions(req, res) {
 
   const { contestId, userId } = req.params;
@@ -109,7 +109,17 @@ async function getUserQuestions(req, res) {
   try {
     const participant = await Participant.findOne({contestId: contestId, userId: userId});
     if(!participant) return res.status(404).send({msg: "no user found"})
-    return res.status(200).send(participant.questions);
+
+    const questions=(participant.questions);
+    
+    const questionId=questions.map((question)=>{
+      return question.questionId;
+    });
+
+    const participantQuestions=await Question.find({'_id':{$in:questionId}});
+
+    return res.status(200).send(participantQuestions);
+
   } catch (err) {
     return res.status(404).send(err.message);
   }
