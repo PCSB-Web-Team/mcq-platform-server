@@ -53,9 +53,10 @@ async function getAllQuestions(req, res) {
   try {
     const allQuestions = await Question.find({});
 
-    res.send(allQuestions);
+    res.send(HttpApiResponse(allQuestions));
   } catch (err) {
-    res.status(404).send(err.message);
+    HandleError("Question", "getAllQuestions", err);
+    res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
