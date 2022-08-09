@@ -28,7 +28,6 @@ async function login(req, res) {
     }
 
     return res.status(404).send(HttpErrorResponse("Invalid Password"));
-    
   } catch (err) {
     await HandleError("Auth", "login", err);
     res.status(400).send(HttpErrorResponse(err));
@@ -39,6 +38,11 @@ async function login(req, res) {
 async function generateUser(req, res) {
   try {
     const { email, eventName, name, mobile } = req.body;
+
+    if (!email || !eventName || !name || !mobile)
+      throw new Error(
+        "All the fields are required: name, email, eventName, mobile"
+      );
 
     // Find user
     let user = await User.findOne({ email });
@@ -85,6 +89,7 @@ async function generateUser(req, res) {
     const createParticipant = await Participant.create({
       userId: user._id,
       contestId: contestId,
+      name,
     });
 
     if (createParticipant) {
