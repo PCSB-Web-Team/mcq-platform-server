@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 const participantSchema = new Schema({
-  userId: { type: mongoose.SchemaTypes.ObjectId, required: true},
+  userId: { type: mongoose.SchemaTypes.ObjectId, required: true },
   name: { type: String, required: true },
   contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
   started: { type: Boolean, default: false },
@@ -12,11 +12,13 @@ const participantSchema = new Schema({
   questions: [
     {
       questionId: { type: Schema.Types.ObjectId, ref: "Question" },
-      bookmark: {type:Boolean,default:false},
+      bookmark: { type: Boolean, default: false },
       attempted: { type: Number, default: null },
     },
   ],
 });
+
+participantSchema.index({ userId: 1, contestId: 1 }, { unique: true });
 
 const Participant = mongoose.model("Participant", participantSchema);
 

@@ -1,18 +1,27 @@
 const Participant = require("../models/participant.model");
 const Contest = require("../models/contest.model");
 const moment = require("moment");
+const { HttpErrorResponse, HttpApiResponse } = require("../utils/utils");
+const User = require("../models/user.model");
 
 async function createParticipant(req, res) {
   const { userId, contestId } = req.body;
-  //5d6ede6a0ba62570afcedd3a
   try {
+    if (!userId || !contestId) {
+      throw new Error("userId and contestId are required");
+    }
+
+    const user = await User.findOne({ _id: userId });
+
     const createParticipant = await Participant.create({
       userId,
       contestId,
+      name: user.name,
     });
-    return res.status(201).send(createParticipant);
+
+    return res.status(201).send(HttpApiResponse(createParticipant));
   } catch (error) {
-    return res.status(400).send(err.message);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 
