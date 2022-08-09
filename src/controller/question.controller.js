@@ -68,9 +68,10 @@ async function getQuestionsForContest(req, res) {
     const getQuestionsForContest = await Question.find({
       contestId,
     });
-    res.send(getQuestionsForContest);
+    res.send(HttpApiResponse(getQuestionsForContest));
   } catch (err) {
-    res.status(404).send(err.message);
+    await HandleError("Question", "getQuestionsForContest", err);
+    res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
