@@ -38,9 +38,10 @@ async function attemptQuestion(req, res) {
     };
     update = { $set: { "questions.$.attempted": attempted } };
     const updateAttempted = await Participant.updateOne(filter, update);
-    return res.send({ msg: "updated attempted question" });
+    return res.status(200).send(HttpApiResponse(updateAttempted));
   } catch (error) {
-    return res.status(400).send(err.message);
+    await HandleError("Participant", "attemptQuestion", err);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 
@@ -53,9 +54,10 @@ async function bookmarkQuestion(req, res) {
     };
     update = { $set: { "questions.$.bookmark": bookmark } };
     const updateAttempted = await Participant.updateOne(filter, update);
-    return res.status(200).send({ msg: "bookmarked question" });
+    return res.status(200).send(HttpApiResponse(updateAttempted));
   } catch (error) {
-    return res.status(400).send(err.message);
+    await HandleError("Participant", "bookmarkQuestion", err);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 
@@ -68,9 +70,10 @@ async function clearQuestion(req, res) {
     };
     update = { $set: { "questions.$.attempted": null } };
     const updateAttempted = await Participant.updateOne(filter, update);
-    return res.status(200).send({ msg: "question selection cleared" });
+    return res.status(200).send(HttpApiResponse(updateAttempted));
   } catch (error) {
-    return res.status(400).send(err.message);
+    await HandleError("Participant", "clearQuestion", err);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 
@@ -86,9 +89,10 @@ async function submitTest(req, res) {
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
     update = { timeTaken: timeTakenSeconds };
     const submitTest = await Participant.updateOne(filter, update);
-    return res.status(200).send({ msg: "Test Submitted!" });
+    return res.status(200).send(HttpApiResponse(submitTest));
   } catch (error) {
-    return res.status(400).send(err.message);
+    await HandleError("Participant", "submitTest", err);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 
@@ -96,10 +100,10 @@ async function getUserParticipations(req, res) {
   const { userId } = req.params;
   try {
     const participations = await Participant.find({ userId });
-    res.send(HttpApiResponse(participations));
+    return res.send(HttpApiResponse(participations));
   } catch (err) {
-    await HandleError(err);
-    res.send(HttpErrorResponse(err));
+    await HandleError("Participant", "getUserParticipations", err);
+    return res.status(400).send(HttpErrorResponse(error));
   }
 }
 

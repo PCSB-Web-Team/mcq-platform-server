@@ -1,12 +1,18 @@
 const Instruction=require("../models/intsructions.model")
+const {
+    HttpApiResponse,
+    HandleError,
+    HttpErrorResponse,
+  } = require("../utils/utils");
 
 async function getInstructions(req,res){
     const{contestid}=req.params;
     try {
         const getInstructions=await Instruction.findOne({"contestId":contestid});
-        return res.status(200).send(getInstructions);
+        return res.status(200).send(HttpApiResponse(getInstructions));
     } catch (error) {
-        return res.status(400).send(err.message);
+        await HandleError("Instruction", "getInstructions", err);
+        res.status(400).send(HttpErrorResponse(err));
     }
 }
 
