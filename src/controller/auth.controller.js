@@ -19,7 +19,7 @@ async function login(req, res) {
     // Find user
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(400).send(HttpErrorResponse("User not found"));
+    if (!user) return res.send(HttpErrorResponse("User not found"));
 
     if (password == user.password) {
       const token = await createToken(user);
@@ -27,10 +27,10 @@ async function login(req, res) {
       return res.status(200).json(HttpApiResponse(user));
     }
 
-    return res.status(400).send(HttpErrorResponse("Invalid Password"));
+    return res.send(HttpErrorResponse("Invalid Password"));
   } catch (err) {
     await HandleError("Auth", "login", err);
-    res.status(400).send(HttpErrorResponse(err));
+    res.send(HttpErrorResponse(err));
   }
 }
 
@@ -112,7 +112,7 @@ async function generateUser(req, res) {
         .send(HttpApiResponse("User created and registered successfully"));
     } else
       return res
-        .status(400)
+        
         .send(
           HttpErrorResponse(
             "User has not been registered or participant already exist"
@@ -120,7 +120,7 @@ async function generateUser(req, res) {
         );
   } catch (err) {
     await HandleError("Auth", "generateUser", err);
-    res.status(400).send(HttpErrorResponse(err.message));
+    res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -137,7 +137,7 @@ async function getProfile(req, res) {
     }
   } catch (err) {
     HandleError("Auth", "getProfile", err);
-    res.status(400).send(HttpErrorResponse(err.message));
+    res.send(HttpErrorResponse(err.message));
   }
 }
 
