@@ -38,6 +38,7 @@ async function attemptQuestion(req, res) {
     };
     update = { $set: { "questions.$.attempted": attempted } };
     const updateAttempted = await Participant.updateOne(filter, update);
+
     return res.status(200).send(HttpApiResponse(updateAttempted));
   } catch (error) {
     await HandleError("Participant", "attemptQuestion", err);
@@ -81,9 +82,9 @@ async function submitTest(req, res) {
   const { userId, contestId } = req.body;
   try {
     const findContest = await Contest.findById(contestId);
-    var startTime = moment(findContest.started);
+    var startTime = moment(findContest.startTime);
     var now = moment(new Date());
-    var timeTaken = moment.duration(startTime.diff(now));
+    var timeTaken = moment.duration(now.diff(startTime));
     var timeTakenSeconds = timeTaken.asSeconds();
 
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
