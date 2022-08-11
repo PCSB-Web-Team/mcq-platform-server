@@ -36,11 +36,9 @@ async function createquestion(req, res) {
 //get question
 
 async function getQuestionByID(req, res) {
-  console.log("hi");
   const { questionId } = req.params;
   try {
     const question = await Question.find({ '_id': questionId });
-    console.log(question);
     if (!question) return res.status(404).send(question);
     return res.status(200).send(HttpApiResponse(question));
   } catch (err) {
