@@ -5,7 +5,7 @@ const participantSchema = new Schema({
   userId: { type: mongoose.SchemaTypes.ObjectId, required: true },
   name: { type: String, required: true },
   contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
-  started: { type: Boolean, default: false },
+  // started: { type: Boolean, default: false },
   score: { type: Number, default: 0 },
   startTime:{type:Number},
   timeTaken: { type: Number },

@@ -35,9 +35,9 @@ async function createquestion(req, res) {
 
 //get question
 
-async function getQuestion(req, res) {
-  const { questionId } = req.params;
+async function getQuestionByID(req, res) {
   console.log("hi");
+  const { questionId } = req.params;
   try {
     const question = await Question.find({ '_id': questionId });
     console.log(question);
@@ -145,7 +145,6 @@ async function getUserQuestions(req, res) {
       options:question.options,
       points:question.points
     }))
-    console.log(Userquestions);
     return res.status(200).send(HttpApiResponse(Userquestions));
   } catch (err) {
     await HandleError("Question", "getUserQuestions", err);
@@ -155,7 +154,7 @@ async function getUserQuestions(req, res) {
 
 module.exports = {
   createquestion,
-  getQuestion,
+  getQuestionByID,
   getAllQuestions,
   getQuestionsForContest,
   updateQuestion,
