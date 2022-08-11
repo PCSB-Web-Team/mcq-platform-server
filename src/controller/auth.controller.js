@@ -19,15 +19,15 @@ async function login(req, res) {
     // Find user
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(404).send(HttpErrorResponse("User not found"));
+    if (!user) return res.status(400).send(HttpErrorResponse("User not found"));
 
-    if (password==user.password) {
+    if (password == user.password) {
       const token = await createToken(user);
       user.token = token;
       return res.status(200).json(HttpApiResponse(user));
     }
 
-    return res.status(404).send(HttpErrorResponse("Invalid Password"));
+    return res.status(400).send(HttpErrorResponse("Invalid Password"));
   } catch (err) {
     await HandleError("Auth", "login", err);
     res.status(400).send(HttpErrorResponse(err));
