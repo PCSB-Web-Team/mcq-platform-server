@@ -10,10 +10,7 @@ const questionSchema = new Schema({
       data: { type: String },
     },
   ],
-  options: {
-    type: [{ type: String }],
-    default: [],
-  },
+  options: {type: [{ type: String }],default: [],},
   correctOption: { type: String, default: null },
   points: { type: Number, default: 1 },
 });

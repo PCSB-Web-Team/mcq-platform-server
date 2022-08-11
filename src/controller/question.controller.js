@@ -24,11 +24,12 @@ async function createquestion(req, res) {
       questionDescription,
       options,
       correctOption,
+      points
     });
     res.send(HttpApiResponse(createquestion));
   } catch (err) {
     await HandleError("Question", "createQuestion", err);
-    res.status(400).send(HttpErrorResponse(err.message));
+    return res.status(400).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -36,9 +37,10 @@ async function createquestion(req, res) {
 
 async function getQuestion(req, res) {
   const { questionId } = req.params;
-
+  console.log("hi");
   try {
-    const question = await Question.findOne({ _id: questionId });
+    const question = await Question.find({ '_id': questionId });
+    console.log(question);
     if (!question) return res.status(404).send(question);
     return res.status(200).send(HttpApiResponse(question));
   } catch (err) {
@@ -52,11 +54,10 @@ async function getQuestion(req, res) {
 async function getAllQuestions(req, res) {
   try {
     const allQuestions = await Question.find({});
-
     res.send(HttpApiResponse(allQuestions));
   } catch (err) {
     await HandleError("Question", "getAllQuestions", err);
-    res.status(404).send(HttpErrorResponse(err.message));
+    return res.status(404).send(HttpErrorResponse(err.message));
   }
 }
 
@@ -136,7 +137,16 @@ async function getUserQuestions(req, res) {
       _id: { $in: questionId },
     });
 
-    return res.status(200).send(HttpApiResponse(participantQuestions));
+    const Userquestions=participantQuestions.map((question)=>({
+      _id:question._id,
+      contestId:question.contestId,
+      title:question.title,
+      questionDescription:question.questionDescription,
+      options:question.options,
+      points:question.points
+    }))
+    console.log(Userquestions);
+    return res.status(200).send(HttpApiResponse(Userquestions));
   } catch (err) {
     await HandleError("Question", "getUserQuestions", err);
     return res.status(404).send(HttpErrorResponse(err.message));

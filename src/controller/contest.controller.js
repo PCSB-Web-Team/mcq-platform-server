@@ -61,7 +61,14 @@ async function getUserRegisteredContests(req, res) {
   try {
     const { userId } = req.params;
     const userRegisteredContests = await Participant.find({ userId: userId });
-    res.status(200).send(HttpApiResponse(userRegisteredContests));
+
+    const userContests = userRegisteredContests.map((contest)=>{
+      return contest.contestId
+    });
+    
+    const getContests=await Contest.find({'_id':{$in:userContests}});
+    // console.log(getContests);
+    res.status(200).send(HttpApiResponse(getContests));
   } catch (err) {
     await HandleError("Contest", "getUserRegisteredContests", err);
     res.status(404).send(HttpErrorResponse(err.message));
@@ -113,7 +120,7 @@ async function enterContest(req, res) {
       return res
         .status(200)
         .send(
-          HttpApiResponse({ msg: "User entring first time", firstEnter: true })
+          HttpApiResponse({ msg: "User enetring first time", firstEnter: true })
         );
     }
 
