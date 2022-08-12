@@ -7,6 +7,7 @@ const {
   HandleError,
 } = require("../utils/utils");
 const User = require("../models/user.model");
+const Question = require("../models/question.model");
 
 async function createParticipant(req, res) {
   const { userId, contestId } = req.body;
@@ -17,12 +18,17 @@ async function createParticipant(req, res) {
 
     const user = await User.findOne({ _id: userId });
 
+    const contest = await Contest.findOne({ _id: contestId });
+
     if (!user) throw new Error("User not found for id: " + userId);
+
+    if (!contest) throw new Error("Contest not found for id: " + contestId);
 
     const createParticipant = await Participant.create({
       userId,
       contestId,
       name: user.name,
+      startTime: contest.startTime,
     });
 
     return res.status(201).send(HttpApiResponse(createParticipant));
@@ -116,14 +122,80 @@ async function checkIfUserRegisteredForContest(req, res) {
 
   try {
     console.log(
+      "\x1b[34m",
       "[Participant: checkIfUserRegisteredForContest]: " +
         JSON.stringify({ contestId, userId })
     );
-    const participant = await Participant.find({ userId, contestId });
-    return res.send(HttpApiResponse(participant.length > 0));
+    const participant = await Participant.findOne({ userId, contestId });
+    if (participant) return res.send(HttpApiResponse(participant));
+    else throw new Error("User is not registered for the events");
   } catch (err) {
     await HandleError("Participant", "checkIfUserRegisteredForContest", err);
     res.send(HttpErrorResponse(err.message));
+  }
+}
+
+async function enterContest(req, res) {
+  const { contestId, userId } = req.params;
+
+  try {
+    const contestParticipant = await Participant.findOne({
+      userId: userId,
+      contestId: contestId,
+    });
+
+    //If not registered for the contest
+    if (!contestParticipant) {
+      throw new Error("User not registered");
+    }
+
+    const contest = await Contest.findOne({ contestId: contestId });
+
+    //If entring first time (lenght of questions assigned to participants does not match to total questions defined for a contest)
+    if (!contestParticipant.started) {
+      let questions = await Question.find({ constestId: contestId });
+
+      //Random question generation
+      for (let i = questions.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+
+      questions = questions.slice(0, contest.totalQuestions);
+
+      //Get the question_ids into an array
+      const questionIds = questions.map((question) => {
+        return { questionId: question._id };
+      });
+
+      //Push the ids into the participants array
+      const participant = await Participant.findOneAndUpdate(
+        { userId: userId, contestId: contestId },
+        {
+          $set: {
+            started: true,
+            questions: questionIds,
+            startTime: new Date(),
+          },
+        }
+      );
+
+      return res
+        .status(200)
+        .send(
+          HttpApiResponse({ msg: "User enetring first time", firstEnter: true })
+        );
+    }
+
+    //If not entered for the first time then send false
+    return res
+      .status(200)
+      .send(
+        HttpApiResponse({ msg: "User already started", firstEnter: false })
+      );
+  } catch (err) {
+    await HandleError("Contest", "enterContest", err);
+    res.status(400).send(HttpErrorResponse(err.messages));
   }
 }
 
@@ -135,4 +207,5 @@ module.exports = {
   submitTest,
   getUserParticipations,
   checkIfUserRegisteredForContest,
+  enterContest,
 };

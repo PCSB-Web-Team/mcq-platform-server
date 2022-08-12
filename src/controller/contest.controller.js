@@ -1,6 +1,5 @@
 const Contest = require("../models/contest.model");
 const Participant = require("../models/participant.model");
-const Question = require("../models/question.model");
 const {
   HttpErrorResponse,
   HttpApiResponse,
@@ -62,77 +61,16 @@ async function getUserRegisteredContests(req, res) {
     const { userId } = req.params;
     const userRegisteredContests = await Participant.find({ userId: userId });
 
-    const userContests = userRegisteredContests.map((contest)=>{
-      return contest.contestId
+    const userContests = userRegisteredContests.map((contest) => {
+      return contest.contestId;
     });
-    
-    const getContests=await Contest.find({'_id':{$in:userContests}});
+
+    const getContests = await Contest.find({ _id: { $in: userContests } });
     // console.log(getContests);
     res.status(200).send(HttpApiResponse(getContests));
   } catch (err) {
     await HandleError("Contest", "getUserRegisteredContests", err);
     res.status(404).send(HttpErrorResponse(err.message));
-  }
-}
-
-//Enter a contest
-
-async function enterContest(req, res) {
-  const { contestId, userId } = req.params;
-
-  try {
-    const participantContest = await Participant.findOne({
-      userId: userId,
-      contestId: contestId,
-    });
-
-    //If not registered for the contest
-    if (!participantContest) {
-      throw new Error("User not registered");
-    }
-
-    const contest = await Contest.findOne({ contestId: contestId });
-
-    //If entring first time (lenght of questions assigned to participants does not match to total questions defined for a contest)
-    if (participantContest.questions.length != contest.totalQuestions) {
-      let questions = await Question.find({ constestId: contestId });
-
-      //Random question generation
-      for (let i = questions.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
-      }
-      questions = questions.slice(0, contest.totalQuestions);
-
-      //Get the question_ids into an array
-      const questionIds = questions.map((question) => {
-        return { questionId: question._id };
-      });
-
-      //Push the ids into the participants array
-      const participant = await Participant.findOneAndUpdate(
-        { userId: userId, contestId: contestId },
-        {
-          $set: { questions: questionIds },
-        }
-      );
-
-      return res
-        .status(200)
-        .send(
-          HttpApiResponse({ msg: "User enetring first time", firstEnter: true })
-        );
-    }
-
-    //If not entered for the first time then send false
-    return res
-      .status(200)
-      .send(
-        HttpApiResponse({ msg: "User already started", firstEnter: false })
-      );
-  } catch (err) {
-    await HandleError("Contest", "enterContest", err);
-    res.status(400).send(HttpErrorResponse(err.messages));
   }
 }
 
@@ -176,7 +114,6 @@ module.exports = {
   newContest,
   getAllContest,
   getUserRegisteredContests,
-  enterContest,
   updateContest,
   deleteContest,
 };

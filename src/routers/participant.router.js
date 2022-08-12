@@ -6,6 +6,7 @@ const {
   submitTest,
   getUserParticipations,
   checkIfUserRegisteredForContest,
+  enterContest,
 } = require("../controller/participant.controller");
 
 const participantRouter = require("express").Router();
@@ -17,4 +18,5 @@ participantRouter.put("/attempted", attemptQuestion);
 participantRouter.put("/bookmark", bookmarkQuestion);
 participantRouter.put("/clearattempted", clearQuestion);
 participantRouter.put("/submit", submitTest);
+participantRouter.post("/entercontest/:contestId/:userId", enterContest);
 module.exports = participantRouter;
