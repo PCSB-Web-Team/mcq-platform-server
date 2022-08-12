@@ -17,6 +17,8 @@ async function createParticipant(req, res) {
 
     const user = await User.findOne({ _id: userId });
 
+    if (!user) throw new Error("User not found for id: " + userId);
+
     const createParticipant = await Participant.create({
       userId,
       contestId,
@@ -25,7 +27,8 @@ async function createParticipant(req, res) {
 
     return res.status(201).send(HttpApiResponse(createParticipant));
   } catch (error) {
-    return res.status(400).send(HttpErrorResponse(error));
+    await HandleError(error);
+    return res.status(400).send(HttpErrorResponse(error.message));
   }
 }
 
@@ -108,6 +111,22 @@ async function getUserParticipations(req, res) {
   }
 }
 
+async function checkIfUserRegisteredForContest(req, res) {
+  const { userId, contestId } = req.params;
+
+  try {
+    console.log(
+      "[Participant: checkIfUserRegisteredForContest]: " +
+        JSON.stringify({ contestId, userId })
+    );
+    const participant = await Participant.find({ userId, contestId });
+    return res.send(HttpApiResponse(participant.length > 0));
+  } catch (err) {
+    await HandleError("Participant", "checkIfUserRegisteredForContest", err);
+    res.send(HttpErrorResponse(err.message));
+  }
+}
+
 module.exports = {
   attemptQuestion,
   createParticipant,
@@ -115,4 +134,5 @@ module.exports = {
   clearQuestion,
   submitTest,
   getUserParticipations,
+  checkIfUserRegisteredForContest,
 };
