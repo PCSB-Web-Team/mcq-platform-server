@@ -38,8 +38,8 @@ async function createquestion(req, res) {
 async function getQuestionByID(req, res) {
   const { questionId } = req.params;
   try {
-    const question = await Question.find({ _id: questionId });
-    if (!question) return res.send(question);
+    const question = await Question.findOne({ _id: questionId });
+    if (!question) return res.send(HttpApiResponse(question));
     return res.send(HttpApiResponse(question));
   } catch (err) {
     await HandleError("Question", "getQuestion", err);
@@ -123,8 +123,7 @@ async function getUserQuestions(req, res) {
       contestId: contestId,
       userId: userId,
     });
-    if (!participant) 
-      return res.send({ msg: "no user found" });
+    if (!participant) return res.send({ msg: "no user found" });
 
     const questions = participant.questions;
 
