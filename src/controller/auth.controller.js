@@ -24,13 +24,13 @@ async function login(req, res) {
     if (password == user.password) {
       const token = await createToken(user);
       user.token = token;
-      return res.status(200).json(HttpApiResponse(user));
+      return res.json(HttpApiResponse(user));
     }
 
     return res.send(HttpErrorResponse("Invalid Password"));
   } catch (err) {
     await HandleError("Auth", "login", err);
-    res.send(HttpErrorResponse(err));
+    return res.send(HttpErrorResponse(err));
   }
 }
 
@@ -64,9 +64,7 @@ async function generateUser(req, res) {
     //Find contest ID
     const contest = await Contest.findOne({ title: eventName });
     if (!contest)
-      return res
-        .status(404)
-        .send(HttpErrorResponse("No contest exist with such name"));
+      return res.send(HttpErrorResponse("No contest exist with such name"));
 
     const contestId = contest._id;
 
@@ -107,20 +105,16 @@ async function generateUser(req, res) {
           }
         );
 
-      return res
-        .status(200)
-        .send(HttpApiResponse("User created and registered successfully"));
+      return res.send(HttpApiResponse("User created and registered successfully"));
     } else
-      return res
-        
-        .send(
+      return res.send(
           HttpErrorResponse(
             "User has not been registered or participant already exist"
           )
         );
   } catch (err) {
     await HandleError("Auth", "generateUser", err);
-    res.send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -131,13 +125,13 @@ async function getProfile(req, res) {
     console.log("[Auth] Get by user-id: " + req.user.id);
     const user = await User.findById(req.user.id).select("-password -__v");
     if (user) {
-      res.send(HttpApiResponse(user));
+      return res.send(HttpApiResponse(user));
     } else {
-      res.status(404).send(HttpErrorResponse("No user exists with such id"));
+      return res.send(HttpErrorResponse("No user exists with such id"));
     }
   } catch (err) {
     HandleError("Auth", "getProfile", err);
-    res.send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 

@@ -31,10 +31,10 @@ async function createParticipant(req, res) {
       startTime: contest.startTime,
     });
 
-    return res.status(201).send(HttpApiResponse(createParticipant));
+    return res.send(HttpApiResponse(createParticipant));
   } catch (error) {
     await HandleError(error);
-    return res.status(400).send(HttpErrorResponse(error.message));
+    return res.send(HttpErrorResponse(error.message));
   }
 }
 
@@ -48,10 +48,10 @@ async function attemptQuestion(req, res) {
     update = { $set: { "questions.$.attempted": attempted } };
     const updateAttempted = await Participant.updateOne(filter, update);
 
-    return res.status(200).send(HttpApiResponse(updateAttempted));
+    return res.send(HttpApiResponse(updateAttempted));
   } catch (error) {
     await HandleError("Participant", "attemptQuestion", err);
-    return res.status(400).send(HttpErrorResponse(error));
+    return res.send(HttpErrorResponse(error));
   }
 }
 
@@ -64,10 +64,10 @@ async function bookmarkQuestion(req, res) {
     };
     update = { $set: { "questions.$.bookmark": bookmark } };
     const updateAttempted = await Participant.updateOne(filter, update);
-    return res.status(200).send(HttpApiResponse(updateAttempted));
+    return res.send(HttpApiResponse(updateAttempted));
   } catch (error) {
     await HandleError("Participant", "bookmarkQuestion", err);
-    return res.status(400).send(HttpErrorResponse(error));
+    return res.send(HttpErrorResponse(error));
   }
 }
 
@@ -80,10 +80,10 @@ async function clearQuestion(req, res) {
     };
     update = { $set: { "questions.$.attempted": null } };
     const updateAttempted = await Participant.updateOne(filter, update);
-    return res.status(200).send(HttpApiResponse(updateAttempted));
+    return res.send(HttpApiResponse(updateAttempted));
   } catch (error) {
     await HandleError("Participant", "clearQuestion", err);
-    return res.status(400).send(HttpErrorResponse(error));
+    return res.send(HttpErrorResponse(error));
   }
 }
 
@@ -99,10 +99,10 @@ async function submitTest(req, res) {
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
     update = { timeTaken: timeTakenSeconds };
     const submitTest = await Participant.updateOne(filter, update);
-    return res.status(200).send(HttpApiResponse(submitTest));
+    return res.send(HttpApiResponse(submitTest));
   } catch (error) {
     await HandleError("Participant", "submitTest", err);
-    return res.status(400).send(HttpErrorResponse(error));
+    return res.send(HttpErrorResponse(error));
   }
 }
 
@@ -113,7 +113,7 @@ async function getUserParticipations(req, res) {
     return res.send(HttpApiResponse(participations));
   } catch (err) {
     await HandleError("Participant", "getUserParticipations", err);
-    return res.status(400).send(HttpErrorResponse(error));
+    return res.send(HttpErrorResponse(error));
   }
 }
 
@@ -131,7 +131,7 @@ async function checkIfUserRegisteredForContest(req, res) {
     else throw new Error("User is not registered for the events");
   } catch (err) {
     await HandleError("Participant", "checkIfUserRegisteredForContest", err);
-    res.send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -181,7 +181,6 @@ async function enterContest(req, res) {
       );
 
       return res
-        .status(200)
         .send(
           HttpApiResponse({ msg: "User enetring first time", firstEnter: true })
         );
@@ -189,13 +188,12 @@ async function enterContest(req, res) {
 
     //If not entered for the first time then send false
     return res
-      .status(200)
       .send(
         HttpApiResponse({ msg: "User already started", firstEnter: false })
       );
   } catch (err) {
     await HandleError("Contest", "enterContest", err);
-    res.status(400).send(HttpErrorResponse(err.messages));
+    return res.send(HttpErrorResponse(err.messages));
   }
 }
 

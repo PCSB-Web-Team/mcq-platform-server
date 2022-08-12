@@ -9,10 +9,10 @@ async function getInstructions(req,res){
     const{contestid}=req.params;
     try {
         const getInstructions=await Instruction.findOne({"contestId":contestid});
-        return res.status(200).send(HttpApiResponse(getInstructions));
+        return res.send(HttpApiResponse(getInstructions));
     } catch (error) {
         await HandleError("Instruction", "getInstructions", err);
-        res.status(400).send(HttpErrorResponse(err));
+        return res.send(HttpErrorResponse(err));
     }
 }
 
@@ -26,9 +26,9 @@ async function createInstruction(req,res){
             negativeMarking,
             time
         });
-        return res.status(201).send(createInstruction);
+        return res.send(createInstruction);
     } catch (error) {
-        return res.status(400).send(err.message);
+        return res.send(err.message);
     }
 }
 

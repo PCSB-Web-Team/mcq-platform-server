@@ -23,7 +23,6 @@ async function newContest(req, res) {
       return res.send(HttpApiResponse(newContest));
     } else {
       return res
-        .status(400)
         .send(
           HttpErrorResponse(
             "Invalid data received, please send title, descriptions, startTime, endTime"
@@ -32,7 +31,7 @@ async function newContest(req, res) {
     }
   } catch (err) {
     await HandleError("Contests", "newContest", err);
-    return res.status(400).send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -42,15 +41,14 @@ async function getAllContest(req, res) {
   try {
     const allContests = await Contest.find({});
     if (allContests.length === 0) {
-      res
-        .status(404)
+      return res
         .send(HttpErrorResponse("No active contest at the moment"));
     } else {
-      res.send(HttpApiResponse(allContests));
+      return res.send(HttpApiResponse(allContests));
     }
   } catch (err) {
     await HandleError("Contest", "getAllContest", err);
-    res.status(404).send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -67,10 +65,10 @@ async function getUserRegisteredContests(req, res) {
 
     const getContests = await Contest.find({ _id: { $in: userContests } });
     // console.log(getContests);
-    res.status(200).send(HttpApiResponse(getContests));
+    return res.send(HttpApiResponse(getContests));
   } catch (err) {
     await HandleError("Contest", "getUserRegisteredContests", err);
-    res.status(404).send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -90,10 +88,10 @@ async function updateContest(req, res) {
 
     const contest = await Contest.updateOne({ _id: contestId }, updatedContest);
 
-    res.send(HttpApiResponse(contest));
+    return res.send(HttpApiResponse(contest));
   } catch (err) {
     await HandleError("Contest", "UpdateContest", err);
-    res.status(400).send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -103,10 +101,10 @@ async function deleteContest(req, res) {
   const { contestId } = req.params;
   try {
     const contest = await Contest.findOneAndRemove({ _id: contestId });
-    res.send(contest);
+    return res.send(contest);
   } catch (err) {
     await HandleError("Contest", "deleteConstest", err);
-    res.status(400).send(HttpErrorResponse(err.message));
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
