@@ -180,17 +180,11 @@ async function enterContest(req, res) {
         }
       );
 
-      return res
-        .send(
-          HttpApiResponse({ msg: "User enetring first time", firstEnter: true })
-        );
+      return res.send(HttpApiResponse(participant));
     }
 
     //If not entered for the first time then send false
-    return res
-      .send(
-        HttpApiResponse({ msg: "User already started", firstEnter: false })
-      );
+    return res.send(HttpApiResponse(contestParticipant));
   } catch (err) {
     await HandleError("Contest", "enterContest", err);
     return res.send(HttpErrorResponse(err.messages));
