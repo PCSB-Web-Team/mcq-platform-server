@@ -186,7 +186,7 @@ async function enterContest(req, res) {
     //If not entered for the first time then send false
     return res.send(HttpApiResponse(contestParticipant));
   } catch (err) {
-    await HandleError("Contest", "enterContest", err);
+    await HandleError("Participant", "enterContest", err);
     return res.send(HttpErrorResponse(err.messages));
   }
 }
