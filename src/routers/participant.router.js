@@ -9,8 +9,8 @@ const {
 
 const participantRouter = require("express").Router();
 participantRouter.get("/");
-// participantRouter.get("/user/:userId", getUserParticipations);
 participantRouter.post("/", createParticipant);
+participantRouter.get("/user/:userId", getUserParticipations);
 participantRouter.put("/attempted", attemptQuestion);
 participantRouter.put("/bookmark", bookmarkQuestion);
 participantRouter.put("/clearattempted", clearQuestion);
