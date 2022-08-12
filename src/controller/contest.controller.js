@@ -22,12 +22,11 @@ async function newContest(req, res) {
       });
       return res.send(HttpApiResponse(newContest));
     } else {
-      return res
-        .send(
-          HttpErrorResponse(
-            "Invalid data received, please send title, descriptions, startTime, endTime"
-          )
-        );
+      return res.send(
+        HttpErrorResponse(
+          "Invalid data received, please send title, descriptions, startTime, endTime"
+        )
+      );
     }
   } catch (err) {
     await HandleError("Contests", "newContest", err);
@@ -41,11 +40,25 @@ async function getAllContest(req, res) {
   try {
     const allContests = await Contest.find({});
     if (allContests.length === 0) {
-      return res
-        .send(HttpErrorResponse("No active contest at the moment"));
+      return res.send(HttpErrorResponse("No active contest at the moment"));
     } else {
       return res.send(HttpApiResponse(allContests));
     }
+  } catch (err) {
+    await HandleError("Contest", "getAllContest", err);
+    return res.send(HttpErrorResponse(err.message));
+  }
+}
+
+async function getContestById(req, res) {
+  try {
+    const { contestId } = req.params;
+    const contest = await Contest.findOne({ _id: contestId });
+    if (!contest)
+      res.send(
+        HttpErrorResponse(new Error("No contest found for id: " + contestId))
+      );
+    return res.send(HttpApiResponse(contest));
   } catch (err) {
     await HandleError("Contest", "getAllContest", err);
     return res.send(HttpErrorResponse(err.message));
@@ -114,4 +127,5 @@ module.exports = {
   getUserRegisteredContests,
   updateContest,
   deleteContest,
+  getContestById,
 };

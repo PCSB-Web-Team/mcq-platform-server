@@ -4,10 +4,11 @@ const {
   getUserRegisteredContests,
   updateContest,
   deleteContest,
+  getContestById,
 } = require("../controller/contest.controller");
 const contestRouter = require("express").Router();
 
-contestRouter.get("/:userId", getUserRegisteredContests);
+contestRouter.get("/:contestId", getContestById);
 contestRouter.post("/", newContest);
 contestRouter.get("/", getAllContest);
 contestRouter.put("/:contestId", updateContest);
