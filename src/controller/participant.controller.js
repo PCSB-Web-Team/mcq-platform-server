@@ -8,6 +8,7 @@ const {
 } = require("../utils/utils");
 const User = require("../models/user.model");
 const Question = require("../models/question.model");
+const { count } = require("../models/participant.model");
 
 async function createParticipant(req, res) {
   const { userId, contestId } = req.body;
@@ -95,7 +96,7 @@ async function submitTest(req, res) {
     var now = moment(new Date());
     var timeTaken = moment.duration(now.diff(startTime));
     var timeTakenSeconds = timeTaken.asSeconds();
-
+    // console.log(timeTakenSeconds);
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
     update = { timeTaken: timeTakenSeconds };
     const submitTest = await Participant.updateOne(filter, update);
@@ -191,6 +192,75 @@ async function enterContest(req, res) {
   }
 }
 
+/*
+algo for calculating results
+for()
+
+*/
+
+//function to calculate score
+async function calculateScore(req,res){
+  const{contestId}=req.body;
+  try {
+    const getQuestions=await Question.find({contestId:contestId});
+
+    let answerKey={}
+    let incrScore={}
+    getQuestions.map((question)=>{
+      answerKey[`${question._id}`]=question.correctOption;
+      incrScore[`${question._id}`]=question.points;
+    })
+  
+    const getParticipants=await Participant.find({contestId:contestId});
+    getParticipants.map(async (participant)=>{
+      let score=0;
+      participantQuestions=participant.questions;
+      participantQuestions.map(async (question)=>{
+          if(question.attempted==answerKey[`${question.questionId}`]){
+            score=score+incrScore[`${question.questionId}`]
+          }
+      })
+      const updateScore=await Participant.findOneAndUpdate({_id:participant._id},{score:score})
+    })
+    const participants=await Participant.find({});
+    return res.send(HttpApiResponse(participants));
+  } catch (error) {
+    return res.send(HttpErrorResponse(err.messages));
+  }
+}
+
+function comparator(a,b){
+  if(a.score==b.score){
+    return a.timeTaken > b.timeTaken ? 1 : a.timeTaken < b.timeTaken ? -1 : 0;
+  }
+
+  return a.score < b.score ? 1 : -1;
+}
+
+async function displayResult(req,res){
+  const {contestId}=req.params;
+
+  try {
+    const getParticipants=await Participant.find({contestId:contestId});
+    getParticipants.sort(comparator)
+    let results=[];
+    let count=1;
+    getParticipants.map((participant)=>{
+      let result={
+        "rank":count,
+        "name":participant.name,
+        "score":participant.score,
+        "time":participant.timeTaken
+      }
+      results.push(result);
+      count++;
+    })
+    return res.send(HttpApiResponse(results));
+  } catch (error) {
+    return res.send(HttpErrorResponse(error.message));
+  }
+}
+
 module.exports = {
   attemptQuestion,
   createParticipant,
@@ -200,4 +270,6 @@ module.exports = {
   getUserParticipations,
   checkIfUserRegisteredForContest,
   enterContest,
+  calculateScore,
+  displayResult
 };

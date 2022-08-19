@@ -8,7 +8,7 @@ const participantSchema = new Schema({
   started: { type: Boolean, default: false },
   score: { type: Number, default: 0 },
   startTime: { type: Date, default: null },
-  timeTaken: { type: Date, default: null },
+  timeTaken: { type: Number, default: null },
   questions: {
     type: [
       {
