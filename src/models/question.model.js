@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
-  contestId: { type: Schema.Types.ObjectId, ref: "Contest" },
+  contestId: { type: Schema.Types.ObjectId },
   title: { type: String },
   questionDescription: [
     {

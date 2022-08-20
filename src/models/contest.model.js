@@ -5,14 +5,14 @@ const moment = require("moment");
 const contestSchema = new Schema({
   title: { type: String },
   descriptions: [{ type: String }],
-  // instructions: [{ type: String }],
-  // pointPerQuestion: { type: Number },
   totalQuestions: { type: Number },
-  // negativeMarking: { type: Number },
-  // time: { type: Number },
   startTime: { type: Date },
   endTime: { type: Date },
   logo: { type: String },
+  // instructions: [{ type: String }],
+  // pointPerQuestion: { type: Number },
+  // negativeMarking: { type: Number },
+  // time: { type: Number },
   // status: { type: Number, default: 1 },
 });
 

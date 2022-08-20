@@ -140,6 +140,13 @@ async function enterContest(req, res) {
   const { contestId, userId } = req.params;
 
   try {
+    console.log(
+      "[participant: enterContest] contestId: " +
+        contestId +
+        ", userId: " +
+        userId
+    );
+
     const contestParticipant = await Participant.findOne({
       userId: userId,
       contestId: contestId,
@@ -150,11 +157,11 @@ async function enterContest(req, res) {
       throw new Error("User not registered");
     }
 
-    const contest = await Contest.findOne({ contestId: contestId });
+    const contest = await Contest.findOne({ _id: contestId });
 
     //If entring first time (lenght of questions assigned to participants does not match to total questions defined for a contest)
     if (!contestParticipant.started) {
-      let questions = await Question.find({ constestId: contestId });
+      let questions = await Question.find({ contestId });
 
       //Random question generation
       for (let i = questions.length - 1; i > 0; i--) {
@@ -163,6 +170,8 @@ async function enterContest(req, res) {
       }
 
       questions = questions.slice(0, contest.totalQuestions);
+
+      console.log("Questions Size: " + questions.length);
 
       //Get the question_ids into an array
       const questionIds = questions.map((question) => {
@@ -199,62 +208,65 @@ for()
 */
 
 //function to calculate score
-async function calculateScore(req,res){
-  const{contestId}=req.body;
+async function calculateScore(req, res) {
+  const { contestId } = req.body;
   try {
-    const getQuestions=await Question.find({contestId:contestId});
+    const getQuestions = await Question.find({ contestId: contestId });
 
-    let answerKey={}
-    let incrScore={}
-    getQuestions.map((question)=>{
-      answerKey[`${question._id}`]=question.correctOption;
-      incrScore[`${question._id}`]=question.points;
-    })
-  
-    const getParticipants=await Participant.find({contestId:contestId});
-    getParticipants.map(async (participant)=>{
-      let score=0;
-      participantQuestions=participant.questions;
-      participantQuestions.map(async (question)=>{
-          if(question.attempted==answerKey[`${question.questionId}`]){
-            score=score+incrScore[`${question.questionId}`]
-          }
-      })
-      const updateScore=await Participant.findOneAndUpdate({_id:participant._id},{score:score})
-    })
-    const participants=await Participant.find({});
+    let answerKey = {};
+    let incrScore = {};
+    getQuestions.map((question) => {
+      answerKey[`${question._id}`] = question.correctOption;
+      incrScore[`${question._id}`] = question.points;
+    });
+
+    const getParticipants = await Participant.find({ contestId: contestId });
+    getParticipants.map(async (participant) => {
+      let score = 0;
+      participantQuestions = participant.questions;
+      participantQuestions.map(async (question) => {
+        if (question.attempted == answerKey[`${question.questionId}`]) {
+          score = score + incrScore[`${question.questionId}`];
+        }
+      });
+      const updateScore = await Participant.findOneAndUpdate(
+        { _id: participant._id },
+        { score: score }
+      );
+    });
+    const participants = await Participant.find({});
     return res.send(HttpApiResponse(participants));
   } catch (error) {
     return res.send(HttpErrorResponse(err.messages));
   }
 }
 
-function comparator(a,b){
-  if(a.score==b.score){
+function comparator(a, b) {
+  if (a.score == b.score) {
     return a.timeTaken > b.timeTaken ? 1 : a.timeTaken < b.timeTaken ? -1 : 0;
   }
 
   return a.score < b.score ? 1 : -1;
 }
 
-async function displayResult(req,res){
-  const {contestId}=req.params;
+async function displayResult(req, res) {
+  const { contestId } = req.params;
 
   try {
-    const getParticipants=await Participant.find({contestId:contestId});
-    getParticipants.sort(comparator)
-    let results=[];
-    let count=1;
-    getParticipants.map((participant)=>{
-      let result={
-        "rank":count,
-        "name":participant.name,
-        "score":participant.score,
-        "time":participant.timeTaken
-      }
+    const getParticipants = await Participant.find({ contestId: contestId });
+    getParticipants.sort(comparator);
+    let results = [];
+    let count = 1;
+    getParticipants.map((participant) => {
+      let result = {
+        rank: count,
+        name: participant.name,
+        score: participant.score,
+        time: participant.timeTaken,
+      };
       results.push(result);
       count++;
-    })
+    });
     return res.send(HttpApiResponse(results));
   } catch (error) {
     return res.send(HttpErrorResponse(error.message));
@@ -271,5 +283,5 @@ module.exports = {
   checkIfUserRegisteredForContest,
   enterContest,
   calculateScore,
-  displayResult
+  displayResult,
 };
