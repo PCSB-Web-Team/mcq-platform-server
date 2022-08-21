@@ -91,6 +91,7 @@ async function generateUser(req, res) {
       await axios
         .post(process.env.sendEmail, {
           email: email,
+          name,
           password: user.password,
           eventName: eventName,
         })
@@ -105,13 +106,15 @@ async function generateUser(req, res) {
           }
         );
 
-      return res.send(HttpApiResponse("User created and registered successfully"));
+      return res.send(
+        HttpApiResponse("User created and registered successfully")
+      );
     } else
       return res.send(
-          HttpErrorResponse(
-            "User has not been registered or participant already exist"
-          )
-        );
+        HttpErrorResponse(
+          "User has not been registered or participant already exist"
+        )
+      );
   } catch (err) {
     await HandleError("Auth", "generateUser", err);
     return res.send(HttpErrorResponse(err.message));
