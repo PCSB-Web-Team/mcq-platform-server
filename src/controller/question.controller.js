@@ -15,7 +15,7 @@ async function createquestion(req, res) {
     options,
     correctOption,
     points,
-  } = req.body);
+  } = JSON.parse(req.body));
   try {
     if (!data.points) data.points = 1;
     const createquestion = await Question.create({
@@ -150,6 +150,31 @@ async function getUserQuestions(req, res) {
   }
 }
 
+async function createQuestionsInBulk(req, res) {
+  try {
+    const { questions, contestId } = req.body;
+    if (!contestId) res.send("contestId not found");
+    if (!questions) res.send("questions not found, should be an array");
+    if (!questions.length) res.send("0 questions received");
+
+    let list = questions.map((que) => {
+      return { ...que, contestId };
+    });
+
+    // for (var i = 0; i < questions.length; i++) {
+    //   const newQ = await Question.create({ ...questions[i], contestId });
+    //   list.push(newQ);
+    // }
+
+    const response = await Question.insertMany(list);
+
+    res.send(response);
+  } catch (err) {
+    console.log(err);
+    res.send(err.message);
+  }
+}
+
 module.exports = {
   createquestion,
   getQuestionByID,
@@ -158,4 +183,5 @@ module.exports = {
   updateQuestion,
   deleteQuestion,
   getUserQuestions,
+  createQuestionsInBulk,
 };
