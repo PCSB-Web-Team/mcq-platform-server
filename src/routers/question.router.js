@@ -16,6 +16,6 @@ questionRouter.get("/:contestId/:userId", getUserQuestions); //get all questions
 questionRouter.put("/:questionId", updateQuestion);
 questionRouter.delete("/:questionId", deleteQuestion);
 questionRouter.post("/bulk", createQuestionsInBulk);
-questionRouter.get("/", getAllQuestions); //get all questions
+questionRouter.get("/all", getAllQuestions); //get all questions
 questionRouter.post("/", createquestion);
 module.exports = questionRouter;
