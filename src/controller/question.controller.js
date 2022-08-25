@@ -40,7 +40,10 @@ async function createquestion(req, res) {
 async function getQuestionByID(req, res) {
   const { questionId } = req.params;
   try {
-    const question = await Question.findOne({ _id: questionId });
+    const question = await Question.findOne(
+      { _id: questionId },
+      { correctOption: 0 }
+    );
     if (!question) return res.send(HttpApiResponse(question));
     return res.send(HttpApiResponse(question));
   } catch (err) {
