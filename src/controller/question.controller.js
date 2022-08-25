@@ -15,6 +15,7 @@ async function createquestion(req, res) {
     options,
     correctOption,
     points,
+    imageLinks,
   } = JSON.parse(req.body));
   try {
     if (!data.points) data.points = 1;
@@ -25,6 +26,7 @@ async function createquestion(req, res) {
       options,
       correctOption,
       points,
+      imageLinks,
     });
     return res.send(HttpApiResponse(createquestion));
   } catch (err) {
@@ -88,6 +90,7 @@ async function updateQuestion(req, res) {
       updatedQuestion.questionDescription = body.questionDescription;
     if (body.options) updatedQuestion.options = body.options;
     if (body.correctOption) updatedQuestion.correctOption = body.correctOption;
+    if (body.imageLinks) updatedQuestion.imageLinks = body.imageLinks;
 
     const updateQuestion = await Question.updateOne(
       { _id: questionId },
