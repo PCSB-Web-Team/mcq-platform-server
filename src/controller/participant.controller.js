@@ -30,6 +30,7 @@ async function createParticipant(req, res) {
       contestId,
       name: user.name,
       startTime: contest.startTime,
+      email: user.email,
     });
 
     return res.send(HttpApiResponse(createParticipant));
@@ -263,6 +264,7 @@ async function displayResult(req, res) {
         name: participant.name,
         score: participant.score,
         time: participant.timeTaken,
+        email: participant.email,
       };
       results.push(result);
       count++;
@@ -270,6 +272,21 @@ async function displayResult(req, res) {
     return res.send(HttpApiResponse(results));
   } catch (error) {
     return res.send(HttpErrorResponse(error.message));
+  }
+}
+
+async function checkParticipated(req, res) {
+  const { userId, contestId } = req.body;
+  try {
+    if (!userId || !contestId) {
+      return res.send(HttpErrorResponse("EventId and ContestId are required"));
+    }
+    const participant = await Participant.findOne({ contestId, userId });
+
+    if (participant) return res.send(HttpApiResponse(true));
+    else return res.send(HttpApiResponse(false));
+  } catch (err) {
+    return res.send(HttpErrorResponse(err.message));
   }
 }
 
@@ -284,4 +301,5 @@ module.exports = {
   enterContest,
   calculateScore,
   displayResult,
+  checkParticipated,
 };

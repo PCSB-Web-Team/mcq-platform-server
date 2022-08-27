@@ -19,6 +19,9 @@ const participantSchema = new Schema({
     ],
     default: [],
   },
+  email: {
+    type: String,
+  },
 });
 
 participantSchema.index({ userId: 1, contestId: 1 }, { unique: true });
