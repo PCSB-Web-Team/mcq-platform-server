@@ -15,7 +15,7 @@ const {
 const participantRouter = require("express").Router();
 participantRouter.get("/");
 participantRouter.post("/", createParticipant);
-participantRouter.get("/checkParticipated", checkParticipated);
+participantRouter.post("/checkParticipated", checkParticipated);
 participantRouter.get("/user/:userId", getUserParticipations);
 participantRouter.get("/result/:contestId", displayResult);
 participantRouter.get("/:userId/:contestId", checkIfUserRegisteredForContest);
