@@ -12,6 +12,7 @@ app.use(
   })
 );
 
+//app now being hosted on heroku
 app.use("/api", Router);
 
 let port = process.env.PORT || 4000;
