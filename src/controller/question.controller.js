@@ -15,7 +15,8 @@ async function createquestion(req, res) {
     options,
     correctOption,
     points,
-  } = req.body);
+    imageLinks,
+  } = JSON.parse(req.body));
   try {
     if (!data.points) data.points = 1;
     const createquestion = await Question.create({
@@ -25,6 +26,7 @@ async function createquestion(req, res) {
       options,
       correctOption,
       points,
+      imageLinks,
     });
     return res.send(HttpApiResponse(createquestion));
   } catch (err) {
@@ -38,7 +40,10 @@ async function createquestion(req, res) {
 async function getQuestionByID(req, res) {
   const { questionId } = req.params;
   try {
-    const question = await Question.findOne({ _id: questionId });
+    const question = await Question.findOne(
+      { _id: questionId },
+      { correctOption: 0 }
+    );
     if (!question) return res.send(HttpApiResponse(question));
     return res.send(HttpApiResponse(question));
   } catch (err) {
@@ -88,6 +93,7 @@ async function updateQuestion(req, res) {
       updatedQuestion.questionDescription = body.questionDescription;
     if (body.options) updatedQuestion.options = body.options;
     if (body.correctOption) updatedQuestion.correctOption = body.correctOption;
+    if (body.imageLinks) updatedQuestion.imageLinks = body.imageLinks;
 
     const updateQuestion = await Question.updateOne(
       { _id: questionId },
@@ -150,6 +156,31 @@ async function getUserQuestions(req, res) {
   }
 }
 
+async function createQuestionsInBulk(req, res) {
+  try {
+    const { questions, contestId } = req.body;
+    if (!contestId) res.send("contestId not found");
+    if (!questions) res.send("questions not found, should be an array");
+    if (!questions.length) res.send("0 questions received");
+
+    let list = questions.map((que) => {
+      return { ...que, contestId };
+    });
+
+    // for (var i = 0; i < questions.length; i++) {
+    //   const newQ = await Question.create({ ...questions[i], contestId });
+    //   list.push(newQ);
+    // }
+
+    const response = await Question.insertMany(list);
+
+    res.send(response);
+  } catch (err) {
+    console.log(err);
+    res.send(err.message);
+  }
+}
+
 module.exports = {
   createquestion,
   getQuestionByID,
@@ -158,4 +189,5 @@ module.exports = {
   updateQuestion,
   deleteQuestion,
   getUserQuestions,
+  createQuestionsInBulk,
 };

@@ -9,15 +9,17 @@ const {
   enterContest,
   calculateScore,
   displayResult,
+  checkParticipated,
 } = require("../controller/participant.controller");
 
 const participantRouter = require("express").Router();
 participantRouter.get("/");
 participantRouter.post("/", createParticipant);
+participantRouter.post("/checkParticipated", checkParticipated);
 participantRouter.get("/user/:userId", getUserParticipations);
-participantRouter.get("/result/:contestId",displayResult)
+participantRouter.get("/result/:contestId", displayResult);
 participantRouter.get("/:userId/:contestId", checkIfUserRegisteredForContest);
-participantRouter.post("/scores",calculateScore);
+participantRouter.post("/scores", calculateScore);
 participantRouter.put("/attempted", attemptQuestion);
 participantRouter.put("/bookmark", bookmarkQuestion);
 participantRouter.put("/clearattempted", clearQuestion);
