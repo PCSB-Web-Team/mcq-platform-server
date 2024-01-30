@@ -188,8 +188,9 @@ async function enterContest(req, res) {
             questions: questionIds,
             startTime: new Date(),
           },
-        }
-      );
+        },
+        { new: true } // This ensures the updated document is returned
+    );
 
       return res.send(HttpApiResponse(participant));
     }
