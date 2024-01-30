@@ -258,7 +258,7 @@ async function calculateScore(req, res) {
 
 function comparator(a, b) {
   if (a.score == b.score) {
-    return a.timeTaken > b.timeTaken ? 1 : a.timeTaken < b.timeTaken ? -1 : 0;
+    return a.timeTaken > b.timeTaken ? -1 : a.timeTaken < b.timeTaken ? 1 : 0;
   }
 
   return a.score < b.score ? 1 : -1;
