@@ -103,10 +103,10 @@ async function submitTest(req, res) {
     }
 
     const findContest = await Contest.findById(contestId);
-    var startTime = moment(findContest.startTime).utcOffset("+05:30");
-    var now = moment().utcOffset("+05:30");
+    var startTime = moment(findContest.startTime);
+    var now = moment(new Date());
     var timeTaken = moment.duration(now.diff(startTime));
-    var timeTakenSeconds = timeTaken.asSeconds();
+    var timeTakenSeconds = Math.abs(timeTaken.asSeconds());
     // console.log(timeTakenSeconds);
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
     update = { timeTaken: timeTakenSeconds, isSubmitted: true };
