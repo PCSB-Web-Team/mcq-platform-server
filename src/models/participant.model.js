@@ -22,6 +22,7 @@ const participantSchema = new Schema({
   email: {
     type: String,
   },
+  isSubmitted: {type: Boolean, default: false}
 });
 
 participantSchema.index({ userId: 1, contestId: 1 }, { unique: true });
