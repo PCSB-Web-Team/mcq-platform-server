@@ -1,0 +1,32 @@
+[
+    {
+        "title": "Who has highest score in 4th innings in debut test match?",
+        "options": [
+            "A. George Headley",
+            "B. Sunil Gavaskar",
+            "C. Kyle Mayers",
+            "D. Gordon Greenidge"
+        ],
+        "correctOption": "C. Kyle Mayers",
+        "points": 1,
+        "imageLinks": [
+            "https://xenia-c2c-images.vercel.app/q70.jpg",
+            "https://xenia-c2c-images.vercel.app/q70.jpg"
+        ]
+    },
+    {
+        "title": "Who has highest score in 4th innings in debut test match?",
+        "options": [
+            "A. George Headley",
+            "B. Sunil Gavaskar",
+            "C. Kyle Mayers",
+            "D. Gordon Greenidge"
+        ],
+        "correctOption": "C. Kyle Mayers",
+        "points": 1,
+        "imageLinks": [
+            "https://xenia-c2c-images.vercel.app/q70.jpg",
+            "https://xenia-c2c-images.vercel.app/q70.jpg"
+        ]
+    }
+]
