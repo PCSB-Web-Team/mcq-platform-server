@@ -103,7 +103,7 @@ async function submitTest(req, res) {
     }
 
     const findContest = await Contest.findById(contestId);
-    var startTime = moment(findContest.startTime);
+    var startTime = moment(findContest.startTime).utcOffset("+05:30");
     var now = moment().utcOffset("+05:30");
     var timeTaken = moment.duration(now.diff(startTime));
     var timeTakenSeconds = timeTaken.asSeconds();
