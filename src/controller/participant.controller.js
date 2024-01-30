@@ -92,14 +92,24 @@ async function clearQuestion(req, res) {
 async function submitTest(req, res) {
   const { userId, contestId } = req.body;
   try {
+
+    const contestParticipant = await Participant.findOne({
+      userId: userId,
+      contestId: contestId,
+    });
+
+    if (contestParticipant.isSubmitted){
+      return res.send(HttpErrorResponse("You have already submitted your responses!"));
+    }
+
     const findContest = await Contest.findById(contestId);
     var startTime = moment(findContest.startTime);
-    var now = moment(new Date());
+    var now = moment().utcOffset("+05:30");
     var timeTaken = moment.duration(now.diff(startTime));
     var timeTakenSeconds = timeTaken.asSeconds();
     // console.log(timeTakenSeconds);
     filter = { $and: [{ userId: userId }, { contestId: contestId }] };
-    update = { timeTaken: timeTakenSeconds };
+    update = { timeTaken: timeTakenSeconds, isSubmitted: true };
     const submitTest = await Participant.updateOne(filter, update);
     return res.send(HttpApiResponse(submitTest));
   } catch (error) {
@@ -156,6 +166,10 @@ async function enterContest(req, res) {
     //If not registered for the contest
     if (!contestParticipant) {
       throw new Error("User not registered");
+    }
+
+    if (contestParticipant.isSubmitted){
+      return res.send(HttpErrorResponse("You have already submitted your responses!"));
     }
 
     const contest = await Contest.findOne({ _id: contestId });
