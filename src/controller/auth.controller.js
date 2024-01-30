@@ -88,6 +88,7 @@ async function generateUser(req, res) {
     });
 
     if (createParticipant) {
+      console.log(process.env.sendEmail)
       await axios
         .post(process.env.sendEmail, {
           email: email,
