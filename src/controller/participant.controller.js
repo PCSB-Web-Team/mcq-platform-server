@@ -297,8 +297,20 @@ async function checkParticipated(req, res) {
       return res.send(HttpErrorResponse("EventId and ContestId are required"));
     }
     const participant = await Participant.findOne({ contestId, userId });
-    if (participant) return res.send(HttpApiResponse(true));
-    else return res.send(HttpApiResponse(false));
+
+    participant_status = {}
+
+    if (participant) {
+      participant_status["submitted"] = participant.isSubmitted;
+      participant_status["participated"] = true;
+      return res.send(HttpApiResponse(participant_status));
+    }
+
+    else{
+      participant_status["submitted"] = participant.isSubmitted;
+      participant_status["participated"] = false;
+      return res.send(HttpApiResponse(participant_status));
+    }
   } catch (err) {
     return res.send(HttpErrorResponse(err.message));
   }
