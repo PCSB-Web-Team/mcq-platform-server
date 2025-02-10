@@ -224,6 +224,75 @@ for()
 */
 
 //function to calculate score
+// async function calculateScore(req, res) {
+//   const { contestId } = req.body;
+//   try {
+//     const getQuestions = await Question.find({ contestId: contestId });
+
+//     let answerKey = {};
+//     let incrScore = {};
+//     getQuestions.map((question) => {
+//       answerKey[`${question._id}`] = question.correctOption;
+//       incrScore[`${question._id}`] = question.points;
+//     });
+
+//     const getParticipants = await Participant.find({ contestId: contestId });
+//     getParticipants.map(async (participant) => {
+//       let score = 0;
+//       participantQuestions = participant.questions;
+//       participantQuestions.map(async (question) => {
+//         if (question.attempted == answerKey[`${question.questionId}`]) {
+//           score = score + incrScore[`${question.questionId}`];
+//         }
+//       });
+//       const updateScore = await Participant.findOneAndUpdate(
+//         { _id: participant._id },
+//         { score: score }
+//       );
+//     });
+//     const participants = await Participant.find({});
+//     return res.send(HttpApiResponse(participants));
+//   } catch (error) {
+//     return res.send(HttpErrorResponse(err.messages));
+//   }
+// }
+// async function calculateScore(req, res) {
+//   const { contestId } = req.body;
+//   try {
+//     const getQuestions = await Question.find({ contestId: contestId });
+
+//     let answerKey = {};
+//     let incrScore = {};
+//     getQuestions.forEach((question) => {
+//       answerKey[`${question._id}`] = question.correctOption;
+//       incrScore[`${question._id}`] = question.points;
+//     });
+
+//     const getParticipants = await Participant.find({ contestId: contestId });
+
+//     for (let participant of getParticipants) {
+//       let score = 0;
+//       let participantQuestions = participant.questions;
+
+//       for (let question of participantQuestions) {
+//         if (question.attempted && question.attempted === answerKey[question.questionId]) {
+//           score += incrScore[question.questionId] || 0;
+//         }
+//       }
+
+//       // Ensure score update is awaited
+//       await Participant.findOneAndUpdate(
+//         { _id: participant._id },
+//         { score: score }
+//       );
+//     }
+
+//     const updatedParticipants = await Participant.find({ contestId: contestId });
+//     return res.send(HttpApiResponse(updatedParticipants));
+//   } catch (error) {
+//     return res.send(HttpErrorResponse(error.message));
+//   }
+// }
 async function calculateScore(req, res) {
   const { contestId } = req.body;
   try {
@@ -231,31 +300,41 @@ async function calculateScore(req, res) {
 
     let answerKey = {};
     let incrScore = {};
-    getQuestions.map((question) => {
-      answerKey[`${question._id}`] = question.correctOption;
+    getQuestions.forEach((question) => {
+      answerKey[`${question._id}`] = question.correctOption.trim().toLowerCase();
       incrScore[`${question._id}`] = question.points;
     });
 
     const getParticipants = await Participant.find({ contestId: contestId });
-    getParticipants.map(async (participant) => {
+
+    for (let participant of getParticipants) {
       let score = 0;
-      participantQuestions = participant.questions;
-      participantQuestions.map(async (question) => {
-        if (question.attempted == answerKey[`${question.questionId}`]) {
-          score = score + incrScore[`${question.questionId}`];
+      let participantQuestions = participant.questions;
+
+      for (let question of participantQuestions) {
+        if (
+          question.attempted &&
+          question.attempted.trim().toLowerCase() === answerKey[question.questionId]
+        ) {
+          score += incrScore[question.questionId] || 0;
         }
-      });
-      const updateScore = await Participant.findOneAndUpdate(
+      }
+
+      console.log(`User: ${participant.name}, Final Score: ${score}`);
+
+      await Participant.findOneAndUpdate(
         { _id: participant._id },
         { score: score }
       );
-    });
-    const participants = await Participant.find({});
-    return res.send(HttpApiResponse(participants));
+    }
+
+    const updatedParticipants = await Participant.find({ contestId: contestId });
+    return res.send(HttpApiResponse(updatedParticipants));
   } catch (error) {
-    return res.send(HttpErrorResponse(err.messages));
+    return res.send(HttpErrorResponse(error.message));
   }
 }
+
 
 function comparator(a, b) {
   if (a.score == b.score) {

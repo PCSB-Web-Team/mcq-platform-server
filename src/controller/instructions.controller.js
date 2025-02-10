@@ -10,7 +10,7 @@ async function getInstructions(req,res){
     try {
         const getInstructions=await Instruction.findOne({"contestId":contestid});
         return res.send(HttpApiResponse(getInstructions));
-    } catch (error) {
+    } catch (err) {
         await HandleError("Instruction", "getInstructions", err);
         return res.send(HttpErrorResponse(err));
     }

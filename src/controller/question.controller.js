@@ -7,18 +7,39 @@ const {
 } = require("../utils/utils");
 
 //create question
+// async function createquestion(req, res) {
+//   let data = ({
+//     contestId,
+//     title,
+//     questionDescription,
+//     options,
+//     correctOption,
+//     points,
+//     imageLinks,
+//   } = JSON.parse(req.body));
+//   try {
+//     if (!data.points) data.points = 1;
+//     const createquestion = await Question.create({
+//       contestId,
+//       title,
+//       questionDescription,
+//       options,
+//       correctOption,
+//       points,
+//       imageLinks,
+//     });
+//     return res.send(HttpApiResponse(createquestion));
+//   } catch (err) {
+//     await HandleError("Question", "createQuestion", err);
+//     return res.send(HttpErrorResponse(err.message));
+//   }
+// }
 async function createquestion(req, res) {
-  let data = ({
-    contestId,
-    title,
-    questionDescription,
-    options,
-    correctOption,
-    points,
-    imageLinks,
-  } = JSON.parse(req.body));
+  const { contestId, title, questionDescription, options, correctOption, points, imageLinks } = req.body;
+
   try {
-    if (!data.points) data.points = 1;
+    if (!points) points = 1;  // Default points to 1 if not provided
+
     const createquestion = await Question.create({
       contestId,
       title,
@@ -28,12 +49,14 @@ async function createquestion(req, res) {
       points,
       imageLinks,
     });
+
     return res.send(HttpApiResponse(createquestion));
   } catch (err) {
     await HandleError("Question", "createQuestion", err);
     return res.send(HttpErrorResponse(err.message));
   }
 }
+
 
 //get question
 
@@ -57,8 +80,10 @@ async function getQuestionByID(req, res) {
 async function getAllQuestions(req, res) {
   try {
     const allQuestions = await Question.find({});
+    console.log(allQuestions);
     return res.send(HttpApiResponse(allQuestions));
   } catch (err) {
+    console.log(err);
     await HandleError("Question", "getAllQuestions", err);
     return res.send(HttpErrorResponse(err.message));
   }

@@ -9,7 +9,7 @@ async function createToken(user) {
       id: user._id,
       email: user.email,
     },
-    process.env.Secret,
+    "1234",//updated
     {
       expiresIn: 6000000,
     }
@@ -25,7 +25,7 @@ const validateToken = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const verified = jwt.verify(token, process.env.Secret);
+    const verified = jwt.verify(token, "1234");//updated
     req.user = verified;
   } catch (err) {
     return res.status(401).send("Invalid Token");

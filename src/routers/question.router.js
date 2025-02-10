@@ -10,8 +10,8 @@ const {
 } = require("../controller/question.controller");
 const questionRouter = require("express").Router();
 
-questionRouter.get("/:questionId", getQuestionByID);
-questionRouter.get("/contest/:contestId", getQuestionsForContest);
+questionRouter.get("/:questionId", getQuestionByID);//working pkp
+questionRouter.get("/contest/:contestId", getQuestionsForContest);//works pkp for all questions of a contest 
 questionRouter.get("/:contestId/:userId", getUserQuestions); //get all questions for a particular user for particular contest
 questionRouter.put("/:questionId", updateQuestion);
 questionRouter.delete("/:questionId", deleteQuestion);
