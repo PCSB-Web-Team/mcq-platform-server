@@ -26,7 +26,7 @@ async function sendCredentials(email, name, password, eventName) {
     from: process.env.EMAIL_USER,
     to: email,
     subject: `Welcome to ${eventName}`,
-    text: `Hello ${name},\n\nYour account has been successfully created for the event: ${eventName}.\n\nYour login credentials:\n\nWebsite - pcsbxenia.in\nEmail: ${email}\nPassword: ${password}\n\nBest Regards,\nEvent Team`,
+    text: `Hello ${name},\n\nYour account has been successfully created for the event: ${eventName}.\n\nYour login credentials:\n\nWebsite - https://mcq.pcsbxenia.in/\nEmail: ${email}\nPassword: ${password}\n\nBest Regards,\nEvent Team`,
   };
 
   try {

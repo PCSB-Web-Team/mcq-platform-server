@@ -16,20 +16,49 @@ async function getInstructions(req,res){
     }
 }
 
-async function createInstruction(req,res){
-    const{contestId,instructions,pointPerQuestion,negativeMarking,time}=req.body;
+// async function createInstruction(req,res){
+//     const{contestId,instructions,pointPerQuestion,negativeMarking,time}=req.body;
+//     try {
+//         const createInstruction=await Instruction.create({
+//             contestId,
+//             instructions,
+//             pointPerQuestion,
+//             negativeMarking,
+//             time
+//         });
+//         return res.send(createInstruction);
+//     } catch (error) {
+//         return res.send(err.message);
+//     }
+// }
+
+
+async function createInstruction(req, res) {
+    const { contestId, instructions, pointPerQuestion, negativeMarking, time } = req.body;
+
     try {
-        const createInstruction=await Instruction.create({
+        // Validate that contestId is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(contestId)) {
+            return res.status(400).send(HttpErrorResponse("Invalid contestId format"));
+        }
+
+        // Create instruction
+        const createInstruction = await Instruction.create({
             contestId,
             instructions,
             pointPerQuestion,
             negativeMarking,
             time
         });
-        return res.send(createInstruction);
+
+        return res.send(HttpApiResponse(createInstruction));
     } catch (error) {
-        return res.send(err.message);
+        await HandleError("Instruction", "createInstruction", error);
+        return res.status(500).send(HttpErrorResponse(error.message));
     }
 }
+
+module.exports = { createInstruction };
+
 
 module.exports={getInstructions,createInstruction}
