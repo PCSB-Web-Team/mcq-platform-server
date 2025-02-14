@@ -12,25 +12,57 @@ const {
 } = require("../utils/utils");
 
 // Configure Nodemailer transporter
-const transporter = nodemailer.createTransport({
+const transporter1 = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER1,
+    pass: process.env.EMAIL_PASS1,
+  },
+});
+const transporter2 = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER2,
+    pass: process.env.EMAIL_PASS2,
+  },
+});
+const transporter3 = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER3,
+    pass: process.env.EMAIL_PASS3,
   },
 });
 
 // Function to send credentials email
 async function sendCredentials(email, name, password, eventName) {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+  const mailOptions1 = {
+    from: process.env.EMAIL_USER1,
+    to: email,
+    subject: `Welcome to ${eventName}`,
+    text: `Hello ${name},\n\nYour account has been successfully created for the event: ${eventName}.\n\nYour login credentials:\n\nWebsite - https://mcq.pcsbxenia.in/\nEmail: ${email}\nPassword: ${password}\n\nBest Regards,\nEvent Team`,
+  };
+  const mailOptions2 = {
+    from: process.env.EMAIL_USER2,
+    to: email,
+    subject: `Welcome to ${eventName}`,
+    text: `Hello ${name},\n\nYour account has been successfully created for the event: ${eventName}.\n\nYour login credentials:\n\nWebsite - https://mcq.pcsbxenia.in/\nEmail: ${email}\nPassword: ${password}\n\nBest Regards,\nEvent Team`,
+  };
+  const mailOptions3 = {
+    from: process.env.EMAIL_USER3,
     to: email,
     subject: `Welcome to ${eventName}`,
     text: `Hello ${name},\n\nYour account has been successfully created for the event: ${eventName}.\n\nYour login credentials:\n\nWebsite - https://mcq.pcsbxenia.in/\nEmail: ${email}\nPassword: ${password}\n\nBest Regards,\nEvent Team`,
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    if (eventName === "Goblet of Debugger") {
+      await transporter1.sendMail(mailOptions1);
+    } else if (eventName === "Fandom") {
+      await transporter2.sendMail(mailOptions2);
+    } else {
+      await transporter3.sendMail(mailOptions3);
+    }
     console.log(`Mail Sent to ${email}`);
   } catch (error) {
     console.error("Error while sending email:", error);
@@ -63,7 +95,9 @@ async function generateUser(req, res) {
   try {
     const { email, eventName, name, mobile } = req.body;
     if (!email || !eventName || !name || !mobile)
-      throw new Error("All fields are required: name, email, eventName, mobile");
+      throw new Error(
+        "All fields are required: name, email, eventName, mobile"
+      );
 
     let user = await User.findOne({ email });
     if (!user) {
@@ -77,11 +111,18 @@ async function generateUser(req, res) {
     }
 
     const contest = await Contest.findOne({ title: eventName });
-    if (!contest) return res.send(HttpErrorResponse("No contest exists with such name"));
+    if (!contest)
+      return res.send(HttpErrorResponse("No contest exists with such name"));
 
     const contestId = contest._id;
-    const findParticipant = await Participant.findOne({ userId: user._id, contestId });
-    if (findParticipant) return res.send(HttpErrorResponse("Already participated in this contest"));
+    const findParticipant = await Participant.findOne({
+      userId: user._id,
+      contestId,
+    });
+    if (findParticipant)
+      return res.send(
+        HttpErrorResponse("Already participated in this contest")
+      );
 
     const createParticipant = await Participant.create({
       userId: user._id,
@@ -91,7 +132,9 @@ async function generateUser(req, res) {
 
     if (createParticipant) {
       await sendCredentials(email, name, user.password, eventName);
-      return res.send(HttpApiResponse("User created and registered successfully"));
+      return res.send(
+        HttpApiResponse("User created and registered successfully")
+      );
     } else {
       return res.send(HttpErrorResponse("User registration failed"));
     }
